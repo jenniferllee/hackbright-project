@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<a href="/logout">Logout</a>
+
+<br>
+<br>
+
+<div>
+  <h1>My Medications</h1>
+  <ul>
+    <li>List of medicines goes here.</li>
+  </ul>
+</div>
+
+<form action="/new-med">
+  <input type="submit" id="add-med-button" value="Add a medication">
+</form>
+
+
+{% endblock %}
