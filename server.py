@@ -50,7 +50,7 @@ def handle_login_form():
             flash("Welcome, " + user.fname + "! You are logged in.")
             return redirect(url_for('show_user_page',
                                     user_id=session['Logged in user']))
-        
+
         # If password is incorrect, flash "Password invalid."
         else:
             flash("Password invalid.")
@@ -85,7 +85,7 @@ def handle_registration_info():
     if user:
         flash("You are already registered. Please log in.")
         return redirect("/login")
-    
+
     # Otherwise, add new user to database and redirect to login page.
     else:
         new_user = User(fname=fname, lname=lname, email=email, password=password)
@@ -154,14 +154,8 @@ def handle_med_info():
 
         freq_id = db.session.query(Frequency.freq_id).filter((Frequency.user_id == user_id) & (Frequency.med_id == med_id)).one()
 
-        # sched_times = request.form.get("time")  # Returns array
-        # time = datetime.strptime(sched_time, '%H:%M')
-        # new_comp = Compliance(freq_id=freq_id, offset=0, sched_time=time)
-        # db.session.add(new_comp)
-        # db.session.commit()
         times_per_day = int(request.form.get("etimes_per_day"))
 
-        # times = []
         for i in range(times_per_day):
             time = request.form.get("everyday-time-" + str(i))
             time = datetime.strptime(time, '%H:%M')
@@ -170,10 +164,51 @@ def handle_med_info():
             db.session.commit()
 
     if frequency == 'day-interval':
-        pass
+
+        cycle_length = request.form.get("interval")
+
+        new_freq = Frequency(user_id=user_id, med_id=med_id, cycle_length=cycle_length,
+                             start_date=start_date, end_date=end_date)
+        db.session.add(new_freq)
+        db.session.commit()
+
+        freq_id = db.session.query(Frequency.freq_id).filter((Frequency.user_id == user_id) & (Frequency.med_id == med_id)).one()
+
+        times_per_day = int(request.form.get("itimes_per_day"))
+
+        for i in range(times_per_day):
+            time = request.form.get("interval-time-" + str(i))
+            time = datetime.strptime(time, '%H:%M')
+            new_comp = Compliance(freq_id=freq_id, offset=0, sched_time=time)
+            db.session.add(new_comp)
+            db.session.commit()
 
     if frequency == 'specific-days':
-        pass
+
+        new_freq = Frequency(user_id=user_id, med_id=med_id, cycle_length=7,
+                             start_date=start_date, end_date=end_date)
+        db.session.add(new_freq)
+        db.session.commit()
+
+        freq_id = db.session.query(Frequency.freq_id).filter((Frequency.user_id == user_id) & (Frequency.med_id == med_id)).one()
+
+        times_per_day = int(request.form.get("stimes_per_day"))
+
+
+        # 1) Determine if day is checked.
+        # 2) Convert day to datetime object. (Monday=0, Sunday=6)
+        # 3) Get start date day (start_date.weekday()).
+        # 4) Calculate offset by comparing datetime object to start date.
+
+
+        # Create for loop for each specific day selected.
+        for i in range(times_per_day):
+            time = request.form.get("specific-time-" + str(i))
+            time = datetime.strptime(time, '%H:%M')
+            # offset = offset
+            new_comp = Compliance(freq_id=freq_id, offset=offset, sched_time=time)
+            db.session.add(new_comp)
+            db.session.commit()
 
     flash("New medication added to your list.")
     return redirect(url_for('show_user_page',

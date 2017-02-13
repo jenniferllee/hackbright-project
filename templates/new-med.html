@@ -58,7 +58,6 @@
         var input_field = '<input type="time">'
 
         $('#everyday-time-input').empty();
-        // $('#everyday-time-input').html(input_field);
 
         for (i=0; i<times_per_day; i++) {
           $('#everyday-time-input').append(input_field);
@@ -67,22 +66,6 @@
         }}
 
       $('#etimes_per_day').bind('input', chooseEverydayTime);
-
-      // function createEverydayTimeArray() {
-      //   var times_per_day = Number($('#etimes_per_day').val());
-        
-      //   sched_times = [];
-
-      //   for (i=0; i<times_per_day; i++) {
-      //     time = $('#everyday-time-input-' + i).val();
-      //     sched_times.push(time);
-      //   }
-
-      //   // $('#everyday-time-input').val() = sched_times;
-      //   return sched_times;
-      // }
-
-      // $('#form-submission-button').on('click', createEverydayTimeArray)
     </script>
     <!-- JAVASCRIPT END -->
 
@@ -93,11 +76,11 @@
       <input type="number" id="interval" name="interval">Days<br>
 
     <label>How many times a day? </label>
-      <input type="number" id="itimes_per_day" name="times_per_day"><br>
+      <input type="number" id="itimes_per_day" name="itimes_per_day"><br>
 
     <label>What time? </label>
       <div id="interval-time-input">
-        <input type="time" id="time" name="time"><br>
+        <input type="time" name="interval-time-0"><br>
       </div>
     </div>
 
@@ -116,13 +99,14 @@
 
       function chooseIntervalTime() {
         var times_per_day = Number($('#itimes_per_day').val());
-        var input_field = '<input type="time" name="time"><br>'
+        var input_field = '<input type="time">'
 
         $('#interval-time-input').empty();
-        $('#interval-time-input').html(input_field);
 
-        for (i=0; i<(times_per_day-1); i++) {
+        for (i=0; i<times_per_day; i++) {
           $('#interval-time-input').append(input_field);
+          $('#interval-time-input').children().last().attr("name", ("interval-time-" + i));
+          $('#interval-time-input').append('<br>');
         }}
 
       $('#itimes_per_day').bind('input', chooseIntervalTime);
@@ -142,11 +126,11 @@
     <input type="checkbox" name="day" value="Su">Sunday</option><br>
 
     <label>How many times a day? </label>
-        <input type="number" id="stimes_per_day" name="times_per_day"><br>
+        <input type="number" id="stimes_per_day" name="stimes_per_day"><br>
 
     <label>What time? </label>
       <div id="specific-time-input">
-        <input type="time" id="time" name="time"><br>
+        <input type="time" name="specific-time-0"><br>
       </div>
     </div>
 
@@ -166,16 +150,23 @@
 
       $('#frequency').on('change', showSpecificDays);
 
+      // function getCheckedDays() {
+      //   var checked = $('input:checkbox:checked').map(function(){
+      //     return $(this).val();
+      //   }
+        
+
 
       function chooseSpecificTime() {
         var times_per_day = Number($('#stimes_per_day').val());
-        var input_field = '<input type="time" name="time"><br>'
+        var input_field = '<input type="time">'
 
         $('#specific-time-input').empty();
-        $('#specific-time-input').html(input_field);
 
-        for (i=0; i<(times_per_day-1); i++) {
+        for (i=0; i<times_per_day; i++) {
           $('#specific-time-input').append(input_field);
+          $('#specific-time-input').children().last().attr("name", ("specific-time-" + i));
+          $('#specific-time-input').append('<br>');
         }}
 
       $('#stimes_per_day').bind('input', chooseSpecificTime);
