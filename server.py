@@ -2,7 +2,7 @@ from jinja2 import StrictUndefined
 from flask import (Flask, jsonify, render_template, redirect, request, flash,
                    session, url_for)
 from flask_debugtoolbar import DebugToolbarExtension
-from model import (User, Medication, Frequency, Compliance, Reminder,
+from model import (User, Medication, Frequency, Compliance,
                    connect_to_db, db)
 from datetime import datetime
 
@@ -100,9 +100,10 @@ def handle_registration_info():
 def show_user_page(user_id):
     """Displays individual user page with medication list."""
 
-    # Add code here
+    # Display medication name, dose, frequency, time
+    meds = db.session.query(Medication.name, Medication.dose).filter((Frequency.user_id == user_id) & (Frequency.med_id == Medication.med_id)).all()
 
-    return render_template("user.html")
+    return render_template("user.html", meds=meds)
 
 
 @app.route("/logout")
@@ -141,8 +142,11 @@ def handle_med_info():
     db.session.commit
     med_id = db.session.query(Medication.med_id).filter((Medication.name == med_name) & (Medication.dose == med_dose)).one()
 
+    # Get start and end dates and convert them to datetime objects.
     start_date = request.form.get("start-date")
+    start_date = datetime.strptime(start_date, '%Y-%m-%d')
     end_date = request.form.get("end-date")
+    end_date = datetime.strptime(end_date, '%Y-%m-%d')
 
     frequency = request.form.get("frequency")
 
@@ -159,7 +163,12 @@ def handle_med_info():
         for i in range(times_per_day):
             time = request.form.get("everyday-time-" + str(i))
             time = datetime.strptime(time, '%H:%M')
-            new_comp = Compliance(freq_id=freq_id, offset=0, sched_time=time)
+            reminder = request.form.get("everyday-remind-" + str(i))
+            if reminder == "yes":
+                reminder = True
+            else:
+                reminder = False
+            new_comp = Compliance(freq_id=freq_id, offset=0, sched_time=time, reminder=reminder)
             db.session.add(new_comp)
             db.session.commit()
 
@@ -194,21 +203,23 @@ def handle_med_info():
 
         times_per_day = int(request.form.get("stimes_per_day"))
 
+        # Determine which day(s) are checked.
+        weekdays = request.form.getlist('day')  # Returns a list of integers
 
-        # 1) Determine if day is checked.
-        # 2) Convert day to datetime object. (Monday=0, Sunday=6)
-        # 3) Get start date day (start_date.weekday()).
-        # 4) Calculate offset by comparing datetime object to start date.
-
+        # Get weekday of start date.
+        start_day = start_date.weekday()
 
         # Create for loop for each specific day selected.
-        for i in range(times_per_day):
-            time = request.form.get("specific-time-" + str(i))
-            time = datetime.strptime(time, '%H:%M')
-            # offset = offset
-            new_comp = Compliance(freq_id=freq_id, offset=offset, sched_time=time)
-            db.session.add(new_comp)
-            db.session.commit()
+        for day in weekdays:
+
+            # Calculate offset by comparing datetime object to start date.
+            offset = int(day) - start_day
+            for i in range(times_per_day):
+                time = request.form.get("specific-time-" + str(i))
+                time = datetime.strptime(time, '%H:%M')
+                new_comp = Compliance(freq_id=freq_id, offset=offset, sched_time=time)
+                db.session.add(new_comp)
+                db.session.commit()
 
     flash("New medication added to your list.")
     return redirect(url_for('show_user_page',

@@ -31,13 +31,17 @@
 
     <!-- Display for Everyday only -->
     <div id="everyday" style="display:none">
-    <label>How many times a day? </label>
-      <input type="number" id="etimes_per_day" name="etimes_per_day"><br>
+      <label>How many times a day? </label>
+        <input type="number" id="etimes_per_day" name="etimes_per_day"><br>
 
-    <label>What time?</label>
+      <label>What time?</label>
         <div id="everyday-time-input">
-          <input type="time" name="everyday-time-0"><br>
+          <input type="time" name="everyday-time-0">
+          Set reminder?
+          <input type="radio" class="everyday-remind-input" name="everyday-remind-0" value="no" checked>No
+          <input type="radio" class="everyday-remind-input" name="everyday-remind-0" value="yes">Yes
         </div>
+          <br>
     </div>
 
 
@@ -55,14 +59,37 @@
 
       function chooseEverydayTime() {
         var times_per_day = Number($('#etimes_per_day').val());
-        var input_field = '<input type="time">'
+        var input_time_field = '<input type="time">';
+        var input_remind_field_no = 'Set reminder? <input type="radio" value="no" checked>No';
+        var input_remind_field_yes = 'Set reminder? <input type="radio" value="yes">Yes';
 
         $('#everyday-time-input').empty();
+        $('#everyday-remind-input').empty();
 
-        for (i=0; i<times_per_day; i++) {
-          $('#everyday-time-input').append(input_field);
+        for (var i=0; i<times_per_day; i++) {
+          // var myDiv = document.createElement('div');
+
+          $('#everyday-time-input').append(input_time_field);
           $('#everyday-time-input').children().last().attr("name", ("everyday-time-" + i));
-          $('#everyday-time-input').append('<br>');
+          // $('#everyday-time-input').append('<br>')
+
+          $('.everyday-remind-input').append(input_remind_field_no);
+          $('.everyday-remind-input').children().last().attr("name", ("everyday-remind-" + i));
+
+          $('.everyday-remind-input').append(input_remind_field_yes);
+          $('.everyday-remind-input').children().last().attr("name", ("everyday-remind-" + i));
+
+          // var remindName = "everyday-remind-" + i;
+          // var input_remind_field = 'Set reminder? <input type="radio" name="' + remindName + '" value="no" checked>No <input type="radio" name="' + remindName + '" value="yes">Yes';
+          // $('.everyday-remind-input').append(input_remind_field);
+          // // $('#everyday-remind-input').children().last().attr("name", ("everyday-remind-" + i));
+          $('.everyday-remind-input').append('<br>');
+
+
+
+          // $('#everyday-remind-input').append(input_remind_field);
+          // $('#everyday-remind-input').children().last().attr("name", ("everyday-remind-" + i));
+          // $('#everyday-remind-input').append('<br>');
         }}
 
       $('#etimes_per_day').bind('input', chooseEverydayTime);
@@ -117,13 +144,13 @@
     <!-- Display for Specific Days only -->
     <div id="specific-days" style="display:none">
     <label>Select the days: </label><br>
-    <input type="checkbox" name="day" value="M">Monday</option><br>
-    <input type="checkbox" name="day" value="T">Tuesday</option><br>
-    <input type="checkbox" name="day" value="W">Wednesday</option><br>
-    <input type="checkbox" name="day" value="Th">Thursday</option><br>
-    <input type="checkbox" name="day" value="F">Friday</option><br>
-    <input type="checkbox" name="day" value="Sa">Saturday</option><br>
-    <input type="checkbox" name="day" value="Su">Sunday</option><br>
+    <input type="checkbox" name="day" value="0">Monday</option><br>
+    <input type="checkbox" name="day" value="1">Tuesday</option><br>
+    <input type="checkbox" name="day" value="2">Wednesday</option><br>
+    <input type="checkbox" name="day" value="3">Thursday</option><br>
+    <input type="checkbox" name="day" value="4">Friday</option><br>
+    <input type="checkbox" name="day" value="5">Saturday</option><br>
+    <input type="checkbox" name="day" value="6">Sunday</option><br>
 
     <label>How many times a day? </label>
         <input type="number" id="stimes_per_day" name="stimes_per_day"><br>

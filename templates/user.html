@@ -1,21 +1,34 @@
-{% extends 'base.html' %}
-{% block content %}
+<!doctype html>
+<html>
+<head>
+  <title>TITLE</title>
+  <script src="http://code.jquery.com/jquery.js"></script>
+</head>
+<body>
 
-<a href="/logout">Logout</a>
+  <a href="/logout">Logout</a>
 
-<br>
-<br>
+  <br>
+  <br>
 
-<div>
-  <h1>My Medications</h1>
-  <ul>
-    <li>List of medicines goes here.</li>
-  </ul>
-</div>
+  <div>
+    <h1>My Medications</h1>
+    {% for med in meds %}
+    <ul>
+      <li>{{med[0]}}, {{med[1]}} <button type="button">Remove</button></li>
+    </ul>
+    {% endfor %}
+  </div>
 
-<form action="/new-med">
-  <input type="submit" id="add-med-button" value="Add a medication">
-</form>
+    <!-- INSERT JAVASCRIPT HERE -->
+    <script type="text/javascript">
+    </script>
+    <!-- END JAVASCRIPT -->
 
 
-{% endblock %}
+  <form action="/new-med">
+    <input type="submit" id="add-med-button" value="Add a medication">
+  </form>
+
+
+</body>

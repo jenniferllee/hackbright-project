@@ -91,11 +91,12 @@ class Compliance(db.Model):
     offset = db.Column(db.Integer, nullable=False)
     sched_time = db.Column(db.DateTime, nullable=False)
     actual_time = db.Column(db.DateTime, nullable=True)
+    reminder = db.Column(db.Boolean, nullable=False)
 
-    # Define relationship to reminder
-    reminder = db.relationship("Reminder",
-                               backref=db.backref("compliance",
-                                                  order_by=comp_id))
+    # # Define relationship to reminder
+    # reminder = db.relationship("Reminder",
+    #                            backref=db.backref("compliance",
+    #                                               order_by=comp_id))
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -103,20 +104,20 @@ class Compliance(db.Model):
         return "<Compliance comp_id=%s taken=%s>" % (self.comp_id, self.taken)
 
 
-class Reminder(db.Model):
-    """Scheduled reminders and what time they are scheduled for."""
+# class Reminder(db.Model):
+#     """Scheduled reminders and what time they are scheduled for."""
 
-    __tablename__ = "reminders"
+#     __tablename__ = "reminders"
 
-    remind_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    comp_id = db.Column(db.Integer,
-                        db.ForeignKey('compliances.comp_id'))
-    time = db.Column(db.DateTime, nullable=False)
+#     remind_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+#     comp_id = db.Column(db.Integer,
+#                         db.ForeignKey('compliances.comp_id'))
+#     time = db.Column(db.DateTime, nullable=False)
 
-    def __repr__(self):
-        """Provide helpful representation when printed."""
+#     def __repr__(self):
+#         """Provide helpful representation when printed."""
 
-        return "<Reminder remind_id=%s time=%s>" % (self.remind_id, self.time)
+#         return "<Reminder remind_id=%s time=%s>" % (self.remind_id, self.time)
 
 
 ##############################################################################
