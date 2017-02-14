@@ -188,7 +188,12 @@ def handle_med_info():
         for i in range(times_per_day):
             time = request.form.get("interval-time-" + str(i))
             time = datetime.strptime(time, '%H:%M')
-            new_comp = Compliance(freq_id=freq_id, offset=0, sched_time=time)
+            reminder = request.form.get("interval-remind-" + str(i))
+            if reminder == "yes":
+                reminder = True
+            else:
+                reminder = False
+            new_comp = Compliance(freq_id=freq_id, offset=0, sched_time=time, reminder=reminder)
             db.session.add(new_comp)
             db.session.commit()
 
@@ -217,7 +222,12 @@ def handle_med_info():
             for i in range(times_per_day):
                 time = request.form.get("specific-time-" + str(i))
                 time = datetime.strptime(time, '%H:%M')
-                new_comp = Compliance(freq_id=freq_id, offset=offset, sched_time=time)
+                reminder = request.form.get("specific-remind-" + str(i))
+                if reminder == "yes":
+                    reminder = True
+                else:
+                    reminder = False
+                new_comp = Compliance(freq_id=freq_id, offset=offset, sched_time=time, reminder=reminder)
                 db.session.add(new_comp)
                 db.session.commit()
 

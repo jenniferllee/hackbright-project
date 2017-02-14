@@ -7,7 +7,7 @@
 <body>
 
   <form action="/new-med-success" method="post">
-    <label>Mediction Name: </label>
+    <label>Medication Name: </label>
       <input type="text" id="med-name" name="med-name"><br>
     
     <label>Dosage: </label>
@@ -61,7 +61,7 @@
         var times_per_day = Number($('#etimes_per_day').val());
         var input_time_field = '<input type="time">';
         var input_remind_field_no = 'Set reminder? <input type="radio" value="no" checked>No';
-        var input_remind_field_yes = 'Set reminder? <input type="radio" value="yes">Yes';
+        var input_remind_field_yes = '<input type="radio" value="yes">Yes';
 
         $('#everyday-time-input').empty();
         $('#everyday-remind-input').empty();
@@ -73,17 +73,17 @@
           $('#everyday-time-input').children().last().attr("name", ("everyday-time-" + i));
           // $('#everyday-time-input').append('<br>')
 
-          $('.everyday-remind-input').append(input_remind_field_no);
-          $('.everyday-remind-input').children().last().attr("name", ("everyday-remind-" + i));
+          $('#everyday-time-input').append(input_remind_field_no);
+          $('#everyday-time-input').children().last().attr("name", ("everyday-remind-" + i));
 
-          $('.everyday-remind-input').append(input_remind_field_yes);
-          $('.everyday-remind-input').children().last().attr("name", ("everyday-remind-" + i));
+          $('#everyday-time-input').append(input_remind_field_yes);
+          $('#everyday-time-input').children().last().attr("name", ("everyday-remind-" + i));
 
           // var remindName = "everyday-remind-" + i;
           // var input_remind_field = 'Set reminder? <input type="radio" name="' + remindName + '" value="no" checked>No <input type="radio" name="' + remindName + '" value="yes">Yes';
           // $('.everyday-remind-input').append(input_remind_field);
           // // $('#everyday-remind-input').children().last().attr("name", ("everyday-remind-" + i));
-          $('.everyday-remind-input').append('<br>');
+          $('#everyday-time-input').append('<br>');
 
 
 
@@ -107,7 +107,10 @@
 
     <label>What time? </label>
       <div id="interval-time-input">
-        <input type="time" name="interval-time-0"><br>
+        <input type="time" name="interval-time-0">
+        Set reminder?
+        <input type="radio" class="interval-remind-input" name="interval-remind-0" value="no" checked>No
+        <input type="radio" class="interval-remind-input" name="interval-remind-0" value="yes">Yes
       </div>
     </div>
 
@@ -127,12 +130,21 @@
       function chooseIntervalTime() {
         var times_per_day = Number($('#itimes_per_day').val());
         var input_field = '<input type="time">'
+        var input_remind_field_no = 'Set reminder? <input type="radio" value="no" checked>No';
+        var input_remind_field_yes = '<input type="radio" value="yes">Yes';
 
         $('#interval-time-input').empty();
 
         for (i=0; i<times_per_day; i++) {
           $('#interval-time-input').append(input_field);
           $('#interval-time-input').children().last().attr("name", ("interval-time-" + i));
+
+          $('#interval-time-input').append(input_remind_field_no);
+          $('#interval-time-input').children().last().attr("name", ("interval-remind-" + i));
+
+          $('#interval-time-input').append(input_remind_field_yes);
+          $('#interval-time-input').children().last().attr("name", ("interval-remind-" + i));
+
           $('#interval-time-input').append('<br>');
         }}
 
@@ -157,7 +169,10 @@
 
     <label>What time? </label>
       <div id="specific-time-input">
-        <input type="time" name="specific-time-0"><br>
+        <input type="time" name="specific-time-0">
+        Set reminder?
+        <input type="radio" class="specific-remind-input" name="specific-remind-0" value="no" checked>No
+        <input type="radio" class="specific-remind-input" name="specific-remind-0" value="yes">Yes
       </div>
     </div>
 
@@ -177,22 +192,25 @@
 
       $('#frequency').on('change', showSpecificDays);
 
-      // function getCheckedDays() {
-      //   var checked = $('input:checkbox:checked').map(function(){
-      //     return $(this).val();
-      //   }
-        
-
 
       function chooseSpecificTime() {
         var times_per_day = Number($('#stimes_per_day').val());
         var input_field = '<input type="time">'
+        var input_remind_field_no = 'Set reminder? <input type="radio" value="no" checked>No';
+        var input_remind_field_yes = '<input type="radio" value="yes">Yes';
 
         $('#specific-time-input').empty();
 
         for (i=0; i<times_per_day; i++) {
           $('#specific-time-input').append(input_field);
           $('#specific-time-input').children().last().attr("name", ("specific-time-" + i));
+
+          $('#specific-time-input').append(input_remind_field_no);
+          $('#specific-time-input').children().last().attr("name", ("specific-remind-" + i));
+
+          $('#specific-time-input').append(input_remind_field_yes);
+          $('#specific-time-input').children().last().attr("name", ("specific-remind-" + i));
+
           $('#specific-time-input').append('<br>');
         }}
 
