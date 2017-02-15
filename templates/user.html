@@ -1,10 +1,5 @@
-<!doctype html>
-<html>
-<head>
-  <title>TITLE</title>
-  <script src="http://code.jquery.com/jquery.js"></script>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block content %}
 
   <a href="/logout">Logout</a>
 
@@ -15,14 +10,38 @@
     <h1>My Medications</h1>
     {% for med in meds %}
     <ul>
-      <li>{{med[0]}}, {{med[1]}} <button type="button">Remove</button></li>
+      <li>{{med[0]}}
+      <ul><li>Dose: {{med[1]}}{{med[2]}}</li></ul>
+      <ul><li>Start date: {{med[3].date()}}</li></ul>
+      <ul><li>End date: {{med[4].date()}} </li></ul>
+      <ul><li><button id="remove-{{med[0]}}" type="button">Remove</button></li></li></ul>
     </ul>
     {% endfor %}
   </div>
 
     <!-- INSERT JAVASCRIPT HERE -->
-    <script type="text/javascript">
-    </script>
+  <script type="text/javascript">
+    // function goneDrug(result) {
+
+
+    // }
+
+    // function removeDrug(evt) {
+    //   alert("Are you sure you want to remove this drug?");
+
+    //   var formInputs = {
+    //     "med": $("#remove-{{med[0]}}")
+    //     "freq": "{{med[5]}}"
+    //   }
+
+    // $.post("/remove-med",
+    //        formInputs,
+    //        goneDrug
+    //        );
+    // }
+
+    // $("#remove-{{med[0]}}").on("click", removeDrug);
+  </script>
     <!-- END JAVASCRIPT -->
 
 
@@ -31,4 +50,4 @@
   </form>
 
 
-</body>
+{% endblock %}

@@ -1,17 +1,20 @@
-<!doctype html>
-<html>
-<head>
-  <title>TITLE</title>
-  <script src="http://code.jquery.com/jquery.js"></script>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block content %}
 
   <form action="/new-med-success" method="post">
     <label>Medication Name: </label>
       <input type="text" id="med-name" name="med-name"><br>
     
     <label>Dosage: </label>
-      <input type="number" id="med-dose" name="med-dose"><br>
+      <input type="number" id="med-dose" name="med-dose">
+      <select id="unit" name="unit">
+        <option value="none">----</option>
+        <option value="mg">mg</option>
+        <option value="mL">mL</option>
+        <option value="capsule">capsule(s)</option>
+        <option value="unit">unit(s)</option>
+        <option value="other">other</option>
+      </select><br>
 
     <label>Start date: </label>
       <input type="date" id="start-date" name="start-date"><br>
@@ -79,17 +82,7 @@
           $('#everyday-time-input').append(input_remind_field_yes);
           $('#everyday-time-input').children().last().attr("name", ("everyday-remind-" + i));
 
-          // var remindName = "everyday-remind-" + i;
-          // var input_remind_field = 'Set reminder? <input type="radio" name="' + remindName + '" value="no" checked>No <input type="radio" name="' + remindName + '" value="yes">Yes';
-          // $('.everyday-remind-input').append(input_remind_field);
-          // // $('#everyday-remind-input').children().last().attr("name", ("everyday-remind-" + i));
           $('#everyday-time-input').append('<br>');
-
-
-
-          // $('#everyday-remind-input').append(input_remind_field);
-          // $('#everyday-remind-input').children().last().attr("name", ("everyday-remind-" + i));
-          // $('#everyday-remind-input').append('<br>');
         }}
 
       $('#etimes_per_day').bind('input', chooseEverydayTime);
@@ -219,5 +212,4 @@
     <!-- JAVASCRIPT END -->
 
 
-</body>
-</html>
+{% endblock %}

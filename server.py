@@ -77,6 +77,7 @@ def handle_registration_info():
     fname = request.form.get("fname")
     lname = request.form.get("lname")
     email = request.form.get("email")
+    phone = request.form.get("phone")
     password = request.form.get("password")
 
     user = db.session.query(User).filter(User.email == email).first()
@@ -88,7 +89,7 @@ def handle_registration_info():
 
     # Otherwise, add new user to database and redirect to login page.
     else:
-        new_user = User(fname=fname, lname=lname, email=email, password=password)
+        new_user = User(fname=fname, lname=lname, email=email, phone=phone, password=password)
         db.session.add(new_user)
         db.session.commit()
 
@@ -100,8 +101,14 @@ def handle_registration_info():
 def show_user_page(user_id):
     """Displays individual user page with medication list."""
 
-    # Display medication name, dose, frequency, time
-    meds = db.session.query(Medication.name, Medication.dose).filter((Frequency.user_id == user_id) & (Frequency.med_id == Medication.med_id)).all()
+    # Display medication name, dose, start date, end date, frequency, time
+    meds = db.session.query(Medication.name,
+                            Medication.dose,
+                            Medication.unit,
+                            Frequency.start_date,
+                            Frequency.end_date,
+                            Frequency.freq_id).filter((Frequency.user_id == user_id) &
+                                                      (Frequency.med_id == Medication.med_id)).all()
 
     return render_template("user.html", meds=meds)
 
@@ -135,12 +142,13 @@ def handle_med_info():
     # Get medication name and dose from form submission and create new instance in Medication table.
     med_name = request.form.get("med-name")
     med_dose = int(request.form.get("med-dose"))
+    med_unit = request.form.get("unit")
 
     # Create new instance in Medication table and get med_id.
-    new_med = Medication(name=med_name, dose=med_dose)
+    new_med = Medication(name=med_name, dose=med_dose, unit=med_unit)
     db.session.add(new_med)
     db.session.commit
-    med_id = db.session.query(Medication.med_id).filter((Medication.name == med_name) & (Medication.dose == med_dose)).one()
+    med_id = db.session.query(Medication.med_id).filter((Medication.name == med_name) & (Medication.dose == med_dose) & (Medication.unit == med_unit)).one()
 
     # Get start and end dates and convert them to datetime objects.
     start_date = request.form.get("start-date")
@@ -234,6 +242,21 @@ def handle_med_info():
     flash("New medication added to your list.")
     return redirect(url_for('show_user_page',
                             user_id=session['Logged in user']))
+
+
+@app.route("/remove-med", methods=['POST'])
+def delete_med():
+    """Removes medication for a user from the database."""
+
+    user = session['Logged in user']
+
+    # Delete all compliance and frequency rows for specific medication.
+
+    # Compliance.query.filter(Compliance.freq_id == freq_id).remove()
+    # Frequency.query.filter((Frequency.user_id == user) & (Frequency.med_id == med_id)).remove()
+
+    print "MEDICATION REMOVED"
+    return
 
 
 if __name__ == "__main__":

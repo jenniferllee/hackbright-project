@@ -14,6 +14,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     fname = db.Column(db.String(64), nullable=False)
     lname = db.Column(db.String(64), nullable=False)
+    phone = db.Column(db.String(10), nullable=False)
     email = db.Column(db.String(64), nullable=False)
     password = db.Column(db.String(64), nullable=False)
 
@@ -31,6 +32,7 @@ class Medication(db.Model):
     med_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     dose = db.Column(db.Integer, nullable=True)
+    unit = db.Column(db.String(10), nullable=True)
     # init_stock = db.Column(db.Integer, nullable=True)
 
     def __repr__(self):
