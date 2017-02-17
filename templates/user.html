@@ -9,38 +9,48 @@
   <div>
     <h1>My Medications</h1>
     {% for med in meds %}
-    <ul>
-      <li>{{med[0]}}
-      <ul><li>Dose: {{med[1]}}{{med[2]}}</li></ul>
-      <ul><li>Start date: {{med[3].date()}}</li></ul>
-      <ul><li>End date: {{med[4].date()}} </li></ul>
-      <ul><li><button id="remove-{{med[0]}}" type="button">Remove</button></li></li></ul>
-    </ul>
+    <div>
+      <ul>
+        <li>{{med[0]}}
+        <ul>
+          <li>Dose: {{med[1]}} {{med[2]}}</li>
+          <li data-start="{{med[3].date()}}">Start date: {{med[3].date()}}</li>
+          <li data-end="{{med[4].date()}}">End date: {{med[4].date()}}</li>
+          <li><button data-btn="123" id="{{med[5]}}" class="remove-btn" type="button">Remove</button></li>
+        </ul>
+      </ul>
+    </div>
     {% endfor %}
   </div>
 
     <!-- INSERT JAVASCRIPT HERE -->
   <script type="text/javascript">
-    // function goneDrug(result) {
+    function confirmDrugRemoval(result) {
+      alert(result);
+      }
 
+    function removeDrug() {
+      confirm("Are you sure you want to remove this drug?");
+      // console.log(this.id);
+      // debugger;
 
-    // }
+      var formInputs = {
+        "med_id": this.id,
+        "start_date": $(this).parent().siblings(":nth-of-type(2)").data("start"),
+        "end_date": $(this).parent().siblings(":nth-of-type(3)").data("end")
+        };
 
-    // function removeDrug(evt) {
-    //   alert("Are you sure you want to remove this drug?");
+    $.post("/remove-med",
+           formInputs,
+           confirmDrugRemoval
+           );
 
-    //   var formInputs = {
-    //     "med": $("#remove-{{med[0]}}")
-    //     "freq": "{{med[5]}}"
-    //   }
+    // Remove medication from user page.
+    // this.parentElement.parentElement.parentElement.parentElement.remove()
+    this.closest("div").remove()
+    }
 
-    // $.post("/remove-med",
-    //        formInputs,
-    //        goneDrug
-    //        );
-    // }
-
-    // $("#remove-{{med[0]}}").on("click", removeDrug);
+    $('.remove-btn').on('click', removeDrug);
   </script>
     <!-- END JAVASCRIPT -->
 

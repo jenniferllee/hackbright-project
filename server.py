@@ -107,7 +107,7 @@ def show_user_page(user_id):
                             Medication.unit,
                             Frequency.start_date,
                             Frequency.end_date,
-                            Frequency.freq_id).filter((Frequency.user_id == user_id) &
+                            Medication.med_id).filter((Frequency.user_id == user_id) &
                                                       (Frequency.med_id == Medication.med_id)).all()
 
     return render_template("user.html", meds=meds)
@@ -144,11 +144,19 @@ def handle_med_info():
     med_dose = int(request.form.get("med-dose"))
     med_unit = request.form.get("unit")
 
-    # Create new instance in Medication table and get med_id.
-    new_med = Medication(name=med_name, dose=med_dose, unit=med_unit)
-    db.session.add(new_med)
-    db.session.commit
-    med_id = db.session.query(Medication.med_id).filter((Medication.name == med_name) & (Medication.dose == med_dose) & (Medication.unit == med_unit)).one()
+    # Check if medication already exists in DB.
+    med = db.session.query(Medication).filter((Medication.name == med_name) & (Medication.dose == med_dose) & (Medication.unit == med_unit)).all()
+
+    # If med returns an empty array, create new instance in Medication table and get med_id.
+    if not med:
+        new_med = Medication(name=med_name, dose=med_dose, unit=med_unit)
+        db.session.add(new_med)
+        db.session.commit
+        med_id = db.session.query(Medication.med_id).filter((Medication.name == med_name) & (Medication.dose == med_dose) & (Medication.unit == med_unit)).one()
+
+    # If med exists in databse, get med_id from Medication table.
+    else:
+        med_id = db.session.query(Medication.med_id).filter((Medication.name == med_name) & (Medication.dose == med_dose) & (Medication.unit == med_unit)).one()
 
     # Get start and end dates and convert them to datetime objects.
     start_date = request.form.get("start-date")
@@ -164,7 +172,10 @@ def handle_med_info():
         db.session.add(new_freq)
         db.session.commit()
 
-        freq_id = db.session.query(Frequency.freq_id).filter((Frequency.user_id == user_id) & (Frequency.med_id == med_id)).one()
+        freq_id = db.session.query(Frequency.freq_id).filter((Frequency.user_id == user_id) &
+                                                             (Frequency.med_id == med_id) &
+                                                             (Frequency.start_date == start_date) &
+                                                             (Frequency.end_date == end_date)).one()
 
         times_per_day = int(request.form.get("etimes_per_day"))
 
@@ -189,7 +200,10 @@ def handle_med_info():
         db.session.add(new_freq)
         db.session.commit()
 
-        freq_id = db.session.query(Frequency.freq_id).filter((Frequency.user_id == user_id) & (Frequency.med_id == med_id)).one()
+        freq_id = db.session.query(Frequency.freq_id).filter((Frequency.user_id == user_id) &
+                                                             (Frequency.med_id == med_id) &
+                                                             (Frequency.start_date == start_date) &
+                                                             (Frequency.end_date == end_date)).one()
 
         times_per_day = int(request.form.get("itimes_per_day"))
 
@@ -212,7 +226,10 @@ def handle_med_info():
         db.session.add(new_freq)
         db.session.commit()
 
-        freq_id = db.session.query(Frequency.freq_id).filter((Frequency.user_id == user_id) & (Frequency.med_id == med_id)).one()
+        freq_id = db.session.query(Frequency.freq_id).filter((Frequency.user_id == user_id) &
+                                                             (Frequency.med_id == med_id) &
+                                                             (Frequency.start_date == start_date) &
+                                                             (Frequency.end_date == end_date)).one()
 
         times_per_day = int(request.form.get("stimes_per_day"))
 
@@ -249,14 +266,28 @@ def delete_med():
     """Removes medication for a user from the database."""
 
     user = session['Logged in user']
+    start_date = request.form.get("start_date")
+    end_date = request.form.get("end_date")
 
-    # Delete all compliance and frequency rows for specific medication.
+    # Delete all compliance and frequency rows for specific medication & frequency.
+    med_id = request.form.get("med_id")
+    freq_id = db.session.query(Frequency.freq_id).filter((Frequency.med_id == med_id) &
+                                                         (Frequency.user_id == user) &
+                                                         (Frequency.start_date == start_date) &
+                                                         (Frequency.end_date == end_date)
+                                                         ).all()[0][0]
 
-    # Compliance.query.filter(Compliance.freq_id == freq_id).remove()
-    # Frequency.query.filter((Frequency.user_id == user) & (Frequency.med_id == med_id)).remove()
+    Compliance.query.filter(Compliance.freq_id == freq_id).delete()
 
-    print "MEDICATION REMOVED"
-    return
+    Frequency.query.filter((Frequency.med_id == med_id) &
+                           (Frequency.user_id == user) &
+                           (Frequency.start_date == start_date) &
+                           (Frequency.end_date == end_date)
+                           ).delete()
+
+    db.session.commit()
+
+    return "Medication removed."
 
 
 if __name__ == "__main__":
