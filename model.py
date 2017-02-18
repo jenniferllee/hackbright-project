@@ -122,6 +122,20 @@ class Compliance(db.Model):
 #         return "<Reminder remind_id=%s time=%s>" % (self.remind_id, self.time)
 
 
+class Drug(db.Model):
+    """Name of drugs from product.csv."""
+
+    __tablename__ = "drugs"
+
+    drug_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    drug_name = db.Column(db.String(1000))
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Drug id=%s name=%s>" % (self.drug_id, self.name)
+
+
 ##############################################################################
 # Helper functions
 

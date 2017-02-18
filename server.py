@@ -2,9 +2,11 @@ from jinja2 import StrictUndefined
 from flask import (Flask, jsonify, render_template, redirect, request, flash,
                    session, url_for)
 from flask_debugtoolbar import DebugToolbarExtension
-from model import (User, Medication, Frequency, Compliance,
+from model import (User, Medication, Frequency, Compliance, Drug,
                    connect_to_db, db)
 from datetime import datetime
+from twilio.rest import TwilioRestClient
+import os
 
 app = Flask(__name__)
 
@@ -128,7 +130,9 @@ def logout():
 def add_new_med():
     """Shows form to add new medication information."""
 
-    return render_template("new-med.html")
+    drugs = db.session.query(Drug.drug_name).all()
+
+    return render_template("new-med.html", drugs=drugs)
 
 
 @app.route("/new-med-success", methods=["POST"])
@@ -255,6 +259,14 @@ def handle_med_info():
                 new_comp = Compliance(freq_id=freq_id, offset=offset, sched_time=time, reminder=reminder)
                 db.session.add(new_comp)
                 db.session.commit()
+
+    # Find these values at https://twilio.com/user/account
+    account_sid = os.environ["TWILIO_ACCOUNT_SID"]
+    auth_token = os.environ["TWILIO_AUTH_TOKEN"]
+    client = TwilioRestClient(account_sid, auth_token)
+
+    message = client.messages.create(to="+16508238552 ", from_="+16509357253",
+                                     body="Time to take your medicine!")
 
     flash("New medication added to your list.")
     return redirect(url_for('show_user_page',
