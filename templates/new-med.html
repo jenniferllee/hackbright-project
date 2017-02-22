@@ -3,10 +3,25 @@
 
   <form action="/new-med-success" method="post">
 
-    <input type="text" list="drugs" />
+    <div class="ui-widget">
+      <label for="med_name">Medication Name: </label>
+      <input id="med-name" name="med-name">
+    </div>
 
-    <label>Medication Name: </label>
-      <input type="text" id="med-name" name="med-name"><br>
+    <script>
+    var dropDownItems;
+
+    $.get('/drug-names.json', function (results) {
+      dropDownItems = JSON.parse(results)
+
+      $(function() {
+      var drugNames = dropDownItems;
+      $('#med-name').autocomplete({
+      source: drugNames
+    });
+    });
+    });
+    </script>
     
     <label>Dosage: </label>
       <input type="number" id="med-dose" name="med-dose">
@@ -29,7 +44,7 @@
     <select id="frequency" name="frequency">
       <option value="none">----</option>
       <option value="everyday">Everyday</option>
-      <option value="day-interval">Day Interval</option>
+      <!-- <option value="day-interval">Day Interval</option> -->
       <option value="specific-days">Specific Days</option>
       <option value="as-needed">As Needed</option>
     </select><br>
@@ -38,7 +53,7 @@
     <!-- Display for Everyday only -->
     <div id="everyday" style="display:none">
       <label>How many times a day? </label>
-        <input type="number" id="etimes_per_day" name="etimes_per_day"><br>
+        <input type="number" id="etimes_per_day" name="etimes_per_day" value=1><br>
 
       <label>What time?</label>
         <div id="everyday-time-input">
@@ -94,12 +109,12 @@
 
     
     <!-- Display for Day Interval only -->
-    <div id="day-interval" style="display:none">
+    <!-- <div id="day-interval" style="display:none">
     <label>Every </label>
       <input type="number" id="interval" name="interval">Days<br>
 
     <label>How many times a day? </label>
-      <input type="number" id="itimes_per_day" name="itimes_per_day"><br>
+      <input type="number" id="itimes_per_day" name="itimes_per_day" value=1><br>
 
     <label>What time? </label>
       <div id="interval-time-input">
@@ -108,60 +123,60 @@
         <input type="radio" class="interval-remind-input" name="interval-remind-0" value="no" checked>No
         <input type="radio" class="interval-remind-input" name="interval-remind-0" value="yes">Yes
       </div>
-    </div>
+    </div> -->
 
 
-    <!-- JAVASCRIPT START -->
+    <!-- JAVASCRIPT START
     <script type="text/javascript">
-      function showDayInterval() {
-        if ($('#frequency').val() == 'day-interval') {
-          $('#day-interval').show();
-        }
-        else {
-          $('#day-interval').hide();
-        }};
+    //   function showDayInterval() {
+    //     if ($('#frequency').val() == 'day-interval') {
+    //       $('#day-interval').show();
+    //     }
+    //     else {
+    //       $('#day-interval').hide();
+    //     }};
 
-      $('#frequency').on('change', showDayInterval);
+    //   $('#frequency').on('change', showDayInterval);
 
-      function chooseIntervalTime() {
-        var times_per_day = Number($('#itimes_per_day').val());
-        var input_field = '<input type="time">'
-        var input_remind_field_no = 'Set reminder? <input type="radio" value="no" checked>No';
-        var input_remind_field_yes = '<input type="radio" value="yes">Yes';
+    //   function chooseIntervalTime() {
+    //     var times_per_day = Number($('#itimes_per_day').val());
+    //     var input_field = '<input type="time">'
+    //     var input_remind_field_no = 'Set reminder? <input type="radio" value="no" checked>No';
+    //     var input_remind_field_yes = '<input type="radio" value="yes">Yes';
 
-        $('#interval-time-input').empty();
+    //     $('#interval-time-input').empty();
 
-        for (i=0; i<times_per_day; i++) {
-          $('#interval-time-input').append(input_field);
-          $('#interval-time-input').children().last().attr("name", ("interval-time-" + i));
+    //     for (i=0; i<times_per_day; i++) {
+    //       $('#interval-time-input').append(input_field);
+    //       $('#interval-time-input').children().last().attr("name", ("interval-time-" + i));
 
-          $('#interval-time-input').append(input_remind_field_no);
-          $('#interval-time-input').children().last().attr("name", ("interval-remind-" + i));
+    //       $('#interval-time-input').append(input_remind_field_no);
+    //       $('#interval-time-input').children().last().attr("name", ("interval-remind-" + i));
 
-          $('#interval-time-input').append(input_remind_field_yes);
-          $('#interval-time-input').children().last().attr("name", ("interval-remind-" + i));
+    //       $('#interval-time-input').append(input_remind_field_yes);
+    //       $('#interval-time-input').children().last().attr("name", ("interval-remind-" + i));
 
-          $('#interval-time-input').append('<br>');
-        }}
+    //       $('#interval-time-input').append('<br>');
+    //     }}
 
-      $('#itimes_per_day').bind('input', chooseIntervalTime);
-    </script>
-    <!-- JAVASCRIPT END -->
+    //   $('#itimes_per_day').bind('input', chooseIntervalTime);
+    // </script>
+    JAVASCRIPT END -->
 
 
     <!-- Display for Specific Days only -->
     <div id="specific-days" style="display:none">
     <label>Select the days: </label><br>
-    <input type="checkbox" name="day" value="0">Monday</option><br>
-    <input type="checkbox" name="day" value="1">Tuesday</option><br>
-    <input type="checkbox" name="day" value="2">Wednesday</option><br>
-    <input type="checkbox" name="day" value="3">Thursday</option><br>
-    <input type="checkbox" name="day" value="4">Friday</option><br>
-    <input type="checkbox" name="day" value="5">Saturday</option><br>
-    <input type="checkbox" name="day" value="6">Sunday</option><br>
+    <input type="checkbox" name="day" value="1">Monday</option><br>
+    <input type="checkbox" name="day" value="2">Tuesday</option><br>
+    <input type="checkbox" name="day" value="3">Wednesday</option><br>
+    <input type="checkbox" name="day" value="4">Thursday</option><br>
+    <input type="checkbox" name="day" value="5">Friday</option><br>
+    <input type="checkbox" name="day" value="6">Saturday</option><br>
+    <input type="checkbox" name="day" value="0">Sunday</option><br>
 
     <label>How many times a day? </label>
-        <input type="number" id="stimes_per_day" name="stimes_per_day"><br>
+        <input type="number" id="stimes_per_day" name="stimes_per_day" value=1><br>
 
     <label>What time? </label>
       <div id="specific-time-input">
@@ -171,9 +186,6 @@
         <input type="radio" class="specific-remind-input" name="specific-remind-0" value="yes">Yes
       </div>
     </div>
-
-    <input type="submit" id="form-submission-button" value="Add">
-  </form>
 
 
     <!-- JAVASCRIPT START-->
@@ -213,6 +225,9 @@
       $('#stimes_per_day').bind('input', chooseSpecificTime);
     </script>
     <!-- JAVASCRIPT END -->
+
+    <input type="submit" id="form-submission-button" value="Add">
+  </form>
 
 
 {% endblock %}

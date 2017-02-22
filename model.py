@@ -53,6 +53,7 @@ class Frequency(db.Model):
                         db.ForeignKey('users.user_id'))
     med_id = db.Column(db.Integer,
                        db.ForeignKey('medications.med_id'))
+    days = db.Column(db.String(20), nullable=False)
     cycle_length = db.Column(db.Integer, nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=True)
@@ -72,12 +73,17 @@ class Frequency(db.Model):
                                  backref=db.backref("frequencies",
                                                     order_by=freq_id))
 
+    def get_days():
+        """Splits days string into list of days."""
+        days = Frequency.days
+        days = list(days)
+        return days
+
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Frequency freq_id=%s med_id=%s times_per_day=%s>" % (self.freq_id,
-                                                                      self.med_id,
-                                                                      self.times_per_day)
+        return "<Frequency freq_id=%s med_id=%s" % (self.freq_id,
+                                                    self.med_id)
 
 
 class Compliance(db.Model):
@@ -90,7 +96,7 @@ class Compliance(db.Model):
                         db.ForeignKey('frequencies.freq_id'))
     # remind_id = db.Column(db.Integer,
     #                       db.ForeignKey('reminders.remind_id'))
-    offset = db.Column(db.Integer, nullable=False)
+    offset = db.Column(db.Integer, nullable=True)
     sched_time = db.Column(db.DateTime, nullable=False)
     actual_time = db.Column(db.DateTime, nullable=True)
     reminder = db.Column(db.Boolean, nullable=False)
@@ -103,7 +109,7 @@ class Compliance(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Compliance comp_id=%s taken=%s>" % (self.comp_id, self.taken)
+        return "<Compliance comp_id=%s reminder=%s>" % (self.comp_id, self.reminder)
 
 
 # class Reminder(db.Model):
@@ -142,7 +148,7 @@ class Drug(db.Model):
 def connect_to_db(app):
     """Connect the database to Flask app."""
 
-    # Configure to use our PstgreSQL database
+    # Configure to use our PostgreSQL database
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///tracker'
     db.app = app
     db.init_app(app)

@@ -7,6 +7,10 @@
   <br>
 
   <div>
+    <a href="/user/{{user_id}}/today">Today</a>
+  </div>
+
+  <div>
     <h1>My Medications</h1>
     {% for med in meds %}
     <div>
@@ -16,7 +20,8 @@
           <li>Dose: {{med[1]}} {{med[2]}}</li>
           <li data-start="{{med[3].date()}}">Start date: {{med[3].date()}}</li>
           <li data-end="{{med[4].date()}}">End date: {{med[4].date()}}</li>
-          <li><button data-btn="123" id="{{med[5]}}" class="remove-btn" type="button">Remove</button></li>
+          <li><button id="{{med[5]}}" class="taken-btn" type="button">Taken</button></li>
+          <li><button id="{{med[5]}}" class="remove-btn" type="button">Remove</button></li>
         </ul>
       </ul>
     </div>
