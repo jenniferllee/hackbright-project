@@ -75,7 +75,14 @@ def load_frequencies():
 
     for row in open("data/frequencies.csv"):
         row = row.rstrip()
-        user_id, med_id, days, cycle_length, start_date, end_date = row.split(",")
+        row = row.split(",")
+
+        user_id = int(row[0])
+        med_id = int(row[1])
+        days = row[2]
+        cycle_length = row[3]
+        start_date = row[4]
+        end_date = row[5]
 
         frequency = Frequency(user_id=user_id,
                               med_id=med_id,

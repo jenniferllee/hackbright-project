@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
+{% macro input(value='hello') -%}
+  <input value="{{value}}"/>
+{%- endmacro %}
 
   <a href="/logout">Logout</a>
 
@@ -22,6 +25,7 @@
           <li data-end="{{med[4].date()}}">End date: {{med[4].date()}}</li>
           <li><button id="{{med[5]}}" class="taken-btn" type="button">Taken</button></li>
           <li><button id="{{med[5]}}" class="remove-btn" type="button">Remove</button></li>
+          <li>{{input()}}</li>
         </ul>
       </ul>
     </div>

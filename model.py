@@ -73,9 +73,9 @@ class Frequency(db.Model):
                                  backref=db.backref("frequencies",
                                                     order_by=freq_id))
 
-    def get_days():
+    def get_days(self):
         """Splits days string into list of days."""
-        days = Frequency.days
+        days = self.days.split(',')
         days = list(days)
         return days
 

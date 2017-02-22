@@ -5,12 +5,9 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import (User, Medication, Frequency, Compliance, Drug,
                    connect_to_db, db)
 from datetime import datetime
-from twilio.rest import TwilioRestClient
-import os
+# from twilio.rest import TwilioRestClient
+# import os
 import json
-import sched
-import time
-# import requests
 
 app = Flask(__name__)
 
@@ -54,8 +51,7 @@ def handle_login_form():
         if password == user.password:
             session['Logged in user'] = user.user_id
             flash("Welcome, " + user.fname + "! You are logged in.")
-            return redirect(url_for('show_user_page',
-                                    user_id=session['Logged in user']))
+            return redirect('/user')
 
         # If password is incorrect, flash "Password invalid."
         else:
@@ -103,8 +99,8 @@ def handle_registration_info():
         return redirect("/login")
 
 
-@app.route("/user/<user_id>")
-def show_user_page(user_id):
+@app.route("/user")
+def show_user_page():
     """Displays individual user page with medication list."""
 
     user_id = session['Logged in user']
@@ -119,6 +115,15 @@ def show_user_page(user_id):
                                                       (Frequency.med_id == Medication.med_id)).all()
 
     return render_template("user.html", user_id=user_id, meds=meds)
+
+
+@app.route("/user/today")
+def show_todays_meds():
+
+    today = datetime.now().weekday()
+    day = 2
+
+    return render_template("today.html", today=today, day=day)
 
 
 @app.route("/logout")
@@ -189,6 +194,7 @@ def handle_med_info():
     frequency = request.form.get("frequency")
 
     if frequency == 'everyday':
+
         new_freq = Frequency(user_id=user_id, med_id=med_id, days='0123456',
                              cycle_length=1, start_date=start_date, end_date=end_date)
         db.session.add(new_freq)
@@ -209,7 +215,7 @@ def handle_med_info():
                 reminder = True
             else:
                 reminder = False
-            new_comp = Compliance(freq_id=freq_id, offset=0, sched_time=everyday_time, reminder=reminder)
+            new_comp = Compliance(freq_id=freq_id, offset=None, sched_time=everyday_time, reminder=reminder)
             db.session.add(new_comp)
             db.session.commit()
 
@@ -280,8 +286,7 @@ def handle_med_info():
                 db.session.commit()
 
     flash("New medication added to your list.")
-    return redirect(url_for('show_user_page',
-                            user_id=session['Logged in user']))
+    return redirect('/user')
 
 
 @app.route("/remove-med", methods=['POST'])
@@ -311,11 +316,6 @@ def delete_med():
     db.session.commit()
 
     return "Medication removed."
-
-
-# @app.route("/user/<user-id>/today")
-# def show_todays_meds():
-#     pass
 
 
 if __name__ == "__main__":
