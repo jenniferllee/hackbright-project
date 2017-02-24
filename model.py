@@ -53,7 +53,7 @@ class Frequency(db.Model):
                         db.ForeignKey('users.user_id'))
     med_id = db.Column(db.Integer,
                        db.ForeignKey('medications.med_id'))
-    days = db.Column(db.String(20), nullable=False)
+    days = db.Column(db.String(100), nullable=False)
     cycle_length = db.Column(db.Integer, nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=True)
@@ -75,15 +75,15 @@ class Frequency(db.Model):
 
     def get_days(self):
         """Splits days string into list of days."""
-        days = self.days.split(',')
-        days = list(days)
+
+        days = self.days.split(', ')
         return days
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Frequency freq_id=%s med_id=%s" % (self.freq_id,
-                                                    self.med_id)
+        return "<Frequency freq_id=%s med_id=%s>" % (self.freq_id,
+                                                     self.med_id)
 
 
 class Compliance(db.Model):
@@ -94,38 +94,14 @@ class Compliance(db.Model):
     comp_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     freq_id = db.Column(db.Integer,
                         db.ForeignKey('frequencies.freq_id'))
-    # remind_id = db.Column(db.Integer,
-    #                       db.ForeignKey('reminders.remind_id'))
-    offset = db.Column(db.Integer, nullable=True)
     sched_time = db.Column(db.DateTime, nullable=False)
-    actual_time = db.Column(db.DateTime, nullable=True)
+    actual_time = db.Column(db.Boolean, nullable=True)
     reminder = db.Column(db.Boolean, nullable=False)
-
-    # # Define relationship to reminder
-    # reminder = db.relationship("Reminder",
-    #                            backref=db.backref("compliance",
-    #                                               order_by=comp_id))
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return "<Compliance comp_id=%s reminder=%s>" % (self.comp_id, self.reminder)
-
-
-# class Reminder(db.Model):
-#     """Scheduled reminders and what time they are scheduled for."""
-
-#     __tablename__ = "reminders"
-
-#     remind_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-#     comp_id = db.Column(db.Integer,
-#                         db.ForeignKey('compliances.comp_id'))
-#     time = db.Column(db.DateTime, nullable=False)
-
-#     def __repr__(self):
-#         """Provide helpful representation when printed."""
-
-#         return "<Reminder remind_id=%s time=%s>" % (self.remind_id, self.time)
 
 
 class Drug(db.Model):

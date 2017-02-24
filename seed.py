@@ -47,78 +47,78 @@ def load_users():
     db.session.commit()
 
 
-def load_medications():
-    """Load medications from medications.csv into database."""
+# def load_medications():
+#     """Load medications from medications.csv into database."""
 
-    print "Medications"
+#     print "Medications"
 
-    Medication.query.delete()
+#     Medication.query.delete()
 
-    for row in open("data/medications.csv"):
-        # row = row.rstrip()
-        name, dose, unit = row.split(",")
+#     for row in open("data/medications.csv"):
+#         # row = row.rstrip()
+#         name, dose, unit = row.split(",")
 
-        medication = Medication(name=name,
-                                dose=dose,
-                                unit=unit)
-        db.session.add(medication)
+#         medication = Medication(name=name,
+#                                 dose=dose,
+#                                 unit=unit)
+#         db.session.add(medication)
 
-    db.session.commit()
-
-
-def load_frequencies():
-    """Load frequencies from frequencies.csv into database."""
-
-    print "Frequencies"
-
-    Frequency.query.delete()
-
-    for row in open("data/frequencies.csv"):
-        row = row.rstrip()
-        row = row.split(",")
-
-        user_id = int(row[0])
-        med_id = int(row[1])
-        days = row[2]
-        cycle_length = row[3]
-        start_date = row[4]
-        end_date = row[5]
-
-        frequency = Frequency(user_id=user_id,
-                              med_id=med_id,
-                              days=days,
-                              cycle_length=cycle_length,
-                              start_date=start_date,
-                              end_date=end_date)
-
-        db.session.add(frequency)
-
-    db.session.commit()
+#     db.session.commit()
 
 
-def load_compliances():
-    """Load compliances from compliances.csv into database."""
+# def load_frequencies():
+#     """Load frequencies from frequencies.csv into database."""
 
-    print "Compliances"
+#     print "Frequencies"
 
-    Compliance.query.delete()
+#     Frequency.query.delete()
 
-    for row in open("data/compliances.csv"):
-        row = row.rstrip()
-        freq_id, offset, sched_time, actual_time, reminder = row.split(",")
+#     for row in open("data/frequencies.csv"):
+#         row = row.rstrip()
+#         row = row.split(",")
 
-        if actual_time == "":
-            actual_time = None
+#         user_id = int(row[0])
+#         med_id = int(row[1])
+#         days = row[2]
+#         cycle_length = row[3]
+#         start_date = row[4]
+#         end_date = row[5]
 
-        compliance = Compliance(freq_id=freq_id,
-                                offset=offset,
-                                sched_time=sched_time,
-                                actual_time=actual_time,
-                                reminder=reminder)
+#         frequency = Frequency(user_id=user_id,
+#                               med_id=med_id,
+#                               days=days,
+#                               cycle_length=cycle_length,
+#                               start_date=start_date,
+#                               end_date=end_date)
 
-        db.session.add(compliance)
+#         db.session.add(frequency)
 
-    db.session.commit()
+#     db.session.commit()
+
+
+# def load_compliances():
+#     """Load compliances from compliances.csv into database."""
+
+#     print "Compliances"
+
+#     Compliance.query.delete()
+
+#     for row in open("data/compliances.csv"):
+#         row = row.rstrip()
+#         freq_id, offset, sched_time, actual_time, reminder = row.split(",")
+
+#         if actual_time == "":
+#             actual_time = None
+
+#         compliance = Compliance(freq_id=freq_id,
+#                                 offset=offset,
+#                                 sched_time=sched_time,
+#                                 actual_time=actual_time,
+#                                 reminder=reminder)
+
+#         db.session.add(compliance)
+
+#     db.session.commit()
 
 
 if __name__ == "__main__":
@@ -131,6 +131,6 @@ if __name__ == "__main__":
     # Import different types of data
     load_drugs()
     load_users()
-    load_medications()
-    load_frequencies()
-    load_compliances()
+    # load_medications()
+    # load_frequencies()
+    # load_compliances()

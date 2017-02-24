@@ -88,11 +88,9 @@
         $('#everyday-remind-input').empty();
 
         for (var i=0; i<times_per_day; i++) {
-          // var myDiv = document.createElement('div');
 
           $('#everyday-time-input').append(input_time_field);
           $('#everyday-time-input').children().last().attr("name", ("everyday-time-" + i));
-          // $('#everyday-time-input').append('<br>')
 
           $('#everyday-time-input').append(input_remind_field_no);
           $('#everyday-time-input').children().last().attr("name", ("everyday-remind-" + i));
@@ -167,13 +165,13 @@
     <!-- Display for Specific Days only -->
     <div id="specific-days" style="display:none">
     <label>Select the days: </label><br>
-    <input type="checkbox" name="day" value="1">Monday</option><br>
-    <input type="checkbox" name="day" value="2">Tuesday</option><br>
-    <input type="checkbox" name="day" value="3">Wednesday</option><br>
-    <input type="checkbox" name="day" value="4">Thursday</option><br>
-    <input type="checkbox" name="day" value="5">Friday</option><br>
-    <input type="checkbox" name="day" value="6">Saturday</option><br>
-    <input type="checkbox" name="day" value="0">Sunday</option><br>
+    <input type="checkbox" name="day" value="Monday">Monday</option><br>
+    <input type="checkbox" name="day" value="Tuesday">Tuesday</option><br>
+    <input type="checkbox" name="day" value="Wednesday">Wednesday</option><br>
+    <input type="checkbox" name="day" value="Thursday">Thursday</option><br>
+    <input type="checkbox" name="day" value="Friday">Friday</option><br>
+    <input type="checkbox" name="day" value="Saturday">Saturday</option><br>
+    <input type="checkbox" name="day" value="Sunday">Sunday</option><br>
 
     <label>How many times a day? </label>
         <input type="number" id="stimes_per_day" name="stimes_per_day" value=1><br>

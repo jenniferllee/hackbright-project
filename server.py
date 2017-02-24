@@ -4,7 +4,8 @@ from flask import (Flask, jsonify, render_template, redirect, request, flash,
 from flask_debugtoolbar import DebugToolbarExtension
 from model import (User, Medication, Frequency, Compliance, Drug,
                    connect_to_db, db)
-from datetime import datetime
+import datetime
+import time
 # from twilio.rest import TwilioRestClient
 # import os
 import json
@@ -105,25 +106,61 @@ def show_user_page():
 
     user_id = session['Logged in user']
 
-    # Display medication name, dose, start date, end date, frequency, time
-    meds = db.session.query(Medication.name,
-                            Medication.dose,
-                            Medication.unit,
-                            Frequency.start_date,
-                            Frequency.end_date,
-                            Medication.med_id).filter((Frequency.user_id == user_id) &
-                                                      (Frequency.med_id == Medication.med_id)).all()
+    frequencies = Frequency.query.filter_by(user_id=user_id).all()
 
-    return render_template("user.html", user_id=user_id, meds=meds)
+    frequency_list = []
+
+    for frequency in frequencies:
+        med = Medication.query.get(frequency.med_id)
+        frequency.name = med.name
+        frequency.dose = med.dose
+        frequency.unit = med.unit
+        frequency.times = set([(compliance.sched_time.strftime('%I:%M %p'),
+                                compliance.reminder) for compliance in Compliance.query.filter_by(freq_id=frequency.freq_id).all()])
+        if frequency.days == 'Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday':
+            frequency.days = 'Everyday'
+
+        frequency_list.append(frequency)
+
+    return render_template("user.html", user_id=user_id, frequencies=frequency_list)
 
 
 @app.route("/user/today")
 def show_todays_meds():
+    """Displays the medications that need to be taken for the day."""
 
-    today = datetime.now().weekday()
-    day = 2
+    user_id = session['Logged in user']
 
-    return render_template("today.html", today=today, day=day)
+    today = datetime.datetime.strftime(datetime.datetime.now(), '%A, %B %d %Y')
+    todays_date = datetime.datetime.now().date()
+
+    frequencies = Frequency.query.filter_by(user_id=user_id).all()
+
+    frequency_list = []
+
+    for frequency in frequencies:
+        med = Medication.query.get(frequency.med_id)
+        frequency.name = med.name
+        frequency.dose = med.dose
+        frequency.unit = med.unit
+        frequency.times = set([compliance.sched_time.strftime('%I:%M %p') for compliance in Compliance.query.filter_by(freq_id=frequency.freq_id).all()])
+        if frequency.days == 'Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday':
+            frequency.days = 'Everyday'
+
+        frequency_list.append(frequency)
+
+    return render_template("today.html", today=today, frequencies=frequency_list)
+
+
+@app.route("/user/today/taken")
+def mark_as_taken():
+    """Adds taken information to compliance table."""
+
+    # comp = Compliance.query.get("comp_id")
+    # comp.taken = True
+    # db.session.commit
+
+    return "Taken"
 
 
 @app.route("/logout")
@@ -163,8 +200,7 @@ def handle_med_info():
     """Handles new medication submission."""
 
     # Get user ID
-    user = session['Logged in user']
-    user_id = db.session.query(User.user_id).filter(User.user_id == user).one()
+    user_id = session['Logged in user']
 
     # Get medication name and dose from form submission and create new instance in Medication table.
     med_name = request.form.get("med-name")
@@ -187,15 +223,15 @@ def handle_med_info():
 
     # Get start and end dates and convert them to datetime objects.
     start_date = request.form.get("start-date")
-    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
     end_date = request.form.get("end-date")
-    end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
 
     frequency = request.form.get("frequency")
 
     if frequency == 'everyday':
 
-        new_freq = Frequency(user_id=user_id, med_id=med_id, days='0123456',
+        new_freq = Frequency(user_id=user_id, med_id=med_id, days='Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday',
                              cycle_length=1, start_date=start_date, end_date=end_date)
         db.session.add(new_freq)
         db.session.commit()
@@ -207,17 +243,86 @@ def handle_med_info():
 
         times_per_day = int(request.form.get("etimes_per_day"))
 
-        for i in range(times_per_day):
-            everyday_time = request.form.get("everyday-time-" + str(i))
-            everyday_time = datetime.strptime(everyday_time, '%H:%M')
-            reminder = request.form.get("everyday-remind-" + str(i))
-            if reminder == "yes":
-                reminder = True
-            else:
-                reminder = False
-            new_comp = Compliance(freq_id=freq_id, offset=None, sched_time=everyday_time, reminder=reminder)
-            db.session.add(new_comp)
-            db.session.commit()
+        date = start_date
+        while date >= start_date and date <= end_date:
+
+            for i in range(times_per_day):
+                everyday_time = request.form.get("everyday-time-" + str(i))
+                print everyday_time
+                everyday_time = datetime.datetime.strptime(everyday_time, '%H:%M').time()
+                everyday_time = datetime.datetime.combine(date, everyday_time)
+                reminder = request.form.get("everyday-remind-" + str(i))
+                if reminder == "yes":
+                    reminder = True
+                else:
+                    reminder = False
+                new_comp = Compliance(freq_id=freq_id, sched_time=everyday_time, reminder=reminder)
+                db.session.add(new_comp)
+                db.session.commit()
+            date += datetime.timedelta(days=1)
+
+    if frequency == 'specific-days':
+
+        # Determine which day(s) are checked.
+        weekdays = request.form.getlist('day')  # Returns a list of the days.
+        weekdays = ', '.join(weekdays)
+
+        new_freq = Frequency(user_id=user_id, med_id=med_id, days=weekdays,
+                             cycle_length=7, start_date=start_date, end_date=end_date)
+        db.session.add(new_freq)
+        db.session.commit()
+
+        freq_id = db.session.query(Frequency.freq_id).filter((Frequency.user_id == user_id) &
+                                                             (Frequency.med_id == med_id) &
+                                                             (Frequency.start_date == start_date) &
+                                                             (Frequency.end_date == end_date)).one()
+
+        times_per_day = int(request.form.get("stimes_per_day"))
+
+        # Get weekday integer of start date.
+        start_day = start_date.weekday()
+        print start_day
+
+        # Convert weekdays back to a list of days.
+        weekdays = weekdays.split(', ')
+
+        # Create for loop for each specific day selected.
+        for day in weekdays:
+            if day == 'Monday':
+                day = 0
+            if day == 'Tuesday':
+                day = 1
+            if day == 'Wednesday':
+                day = 2
+            if day == 'Thursday':
+                day = 3
+            if day == 'Friday':
+                day = 4
+            if day == 'Saturday':
+                day = 5
+            if day == 'Sunday':
+                day = 6
+
+            # Calculate offset by comparing day to start day.
+            offset = day - start_day
+            # print offset
+
+            date = start_date + datetime.timedelta(days=offset)
+            while date >= start_date and date <= end_date:
+                # print date
+                for i in range(times_per_day):
+                    specific_time = request.form.get("specific-time-" + str(i))
+                    specific_time = datetime.datetime.strptime(specific_time, '%H:%M').time()
+                    specific_time = datetime.datetime.combine(date, specific_time)
+                    reminder = request.form.get("specific-remind-" + str(i))
+                    if reminder == "yes":
+                        reminder = True
+                    else:
+                        reminder = False
+                    new_comp = Compliance(freq_id=freq_id, sched_time=specific_time, reminder=reminder)
+                    db.session.add(new_comp)
+                    db.session.commit()
+                date += datetime.timedelta(days=7)
 
     # if frequency == 'day-interval':
 
@@ -246,44 +351,6 @@ def handle_med_info():
     #         new_comp = Compliance(freq_id=freq_id, offset=0, sched_time=interval_time, reminder=reminder)
     #         db.session.add(new_comp)
     #         db.session.commit()
-
-    if frequency == 'specific-days':
-
-        # Determine which day(s) are checked.
-        weekdays = request.form.getlist('day')  # Returns a list of strings ("0", "1", etc.)
-        weekdays = ''.join(weekdays)
-
-        new_freq = Frequency(user_id=user_id, med_id=med_id, days=weekdays,
-                             cycle_length=7, start_date=start_date, end_date=end_date)
-        db.session.add(new_freq)
-        db.session.commit()
-
-        freq_id = db.session.query(Frequency.freq_id).filter((Frequency.user_id == user_id) &
-                                                             (Frequency.med_id == med_id) &
-                                                             (Frequency.start_date == start_date) &
-                                                             (Frequency.end_date == end_date)).one()
-
-        times_per_day = int(request.form.get("stimes_per_day"))
-
-        # Get weekday of start date.
-        # start_day = start_date.weekday()
-
-        # Create for loop for each specific day selected.
-        for day in weekdays:
-
-            # Calculate offset by comparing datetime object to start date.
-            # offset = int(day) - start_day
-            for i in range(times_per_day):
-                specific_time = request.form.get("specific-time-" + str(i))
-                specific_time = datetime.strptime(specific_time, '%H:%M')
-                reminder = request.form.get("specific-remind-" + str(i))
-                if reminder == "yes":
-                    reminder = True
-                else:
-                    reminder = False
-                new_comp = Compliance(freq_id=freq_id, offset=None, sched_time=specific_time, reminder=reminder)
-                db.session.add(new_comp)
-                db.session.commit()
 
     flash("New medication added to your list.")
     return redirect('/user')

@@ -1,34 +1,52 @@
 {% extends 'base.html' %}
 {% block content %}
-{% macro input(value='hello') -%}
+<!-- {% macro input(value='hello') -%}
   <input value="{{value}}"/>
-{%- endmacro %}
-
-  <a href="/logout">Logout</a>
-
-  <br>
-  <br>
+{%- endmacro %} -->
 
   <div>
-    <a href="/user/{{user_id}}/today">Today</a>
+    <a href="/logout">Logout</a>
   </div>
 
   <div>
+    <a href="/user">View All Medications</a>
+  </div>
+
+  <div>
+    <a href="/user/today">Today</a>
+  </div>
+
+  <br>
+  <br>
+
+  <form action="/new-med">
+    <input type="submit" id="add-med-button" value="Add a medication">
+  </form>
+
+  <div>
     <h1>My Medications</h1>
-    {% for med in meds %}
+    {% for frequency in frequencies %}
+
     <div>
       <ul>
-        <li>{{med[0]}}
+        <li>{{frequency.name}}
         <ul>
-          <li>Dose: {{med[1]}} {{med[2]}}</li>
-          <li data-start="{{med[3].date()}}">Start date: {{med[3].date()}}</li>
-          <li data-end="{{med[4].date()}}">End date: {{med[4].date()}}</li>
-          <li><button id="{{med[5]}}" class="taken-btn" type="button">Taken</button></li>
-          <li><button id="{{med[5]}}" class="remove-btn" type="button">Remove</button></li>
-          <li>{{input()}}</li>
+          <li>Dose: {{frequency.dose}} {{frequency.unit}}</li>
+          <li data-start="{{frequency.start_date.date()}}">Start date: {{frequency.start_date.date()}}</li>
+          <li data-end="{{frequency.end_date.date()}}">End date: {{frequency.end_date.date()}}</li>
+          <li id="days-{{frequency.freq_id}}">Days: {{frequency.days}}</li>
+          {% for time in frequency.times %}
+          <li>Scheduled time: {{time[0]}}
+              {% if time[1] == True %}
+              Reminder Set
+              {% endif %}
+          {% endfor %}
+          <li><button id="{{frequency.med_id}}" class="remove-btn" type="button">Remove</button></li>
+          <!-- <li>{{input()}}</li> -->
         </ul>
       </ul>
     </div>
+
     {% endfor %}
   </div>
 
@@ -40,8 +58,6 @@
 
     function removeDrug() {
       confirm("Are you sure you want to remove this drug?");
-      // console.log(this.id);
-      // debugger;
 
       var formInputs = {
         "med_id": this.id,
@@ -54,19 +70,11 @@
            confirmDrugRemoval
            );
 
-    // Remove medication from user page.
-    // this.parentElement.parentElement.parentElement.parentElement.remove()
     this.closest("div").remove()
     }
 
     $('.remove-btn').on('click', removeDrug);
   </script>
     <!-- END JAVASCRIPT -->
-
-
-  <form action="/new-med">
-    <input type="submit" id="add-med-button" value="Add a medication">
-  </form>
-
 
 {% endblock %}
