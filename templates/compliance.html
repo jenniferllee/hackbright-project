@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div>
+  <a href="/logout">Logout</a>
+</div>
+
+<div>
+  <a href="/user">View All Medications</a>
+</div>
+
+<div>
+  <a href="/user/today">Today</a>
+</div>
+
+<div>
+  <a href="/user/compliance">Compliance</a>
+</div>
+
+<br>
+<br>
+
+<form>
+  Dates between:
+  <input type="date" id="comp-start" name="comp-start"> and
+  <input type="date" id="comp-end" name="comp-end" value={{today}}>
+  <input type="submit" id="comp-btn" value="Go">
+</form>
+
+<br>
+<br>
+
+<div class="comp-chart">
+  <canvas id="donutChart"></canvas>
+  <div id="donutLegend" class="chart-legend"></div>
+<div>
+
+<script type="text/javascript">
+function showChart(data) {
+  Chart.types.doughnut.extend({
+    name: "DoughnutAlt",
+    draw: function() {
+        Chart.types.Doughnut.prototype.draw.apply(this, arguments);
+        this.chart.ctx.fillStyle = 'black';
+        this.chart.ctx.textBaseline = 'middle';
+        this.chart.ctx.fillText(this.segments[0].value + "%", this.chart.width / 2 - 20, this.chart.width / 2, 200);
+    }
+  });
+
+
+  var options = { responsive: true };
+
+  var ctx_donut = $("#donutChart").get(0).getContext("2d");
+
+  var myDonutChart = new Chart(ctx_donut, {
+                                            type: 'doughnut',
+                                            data: data,
+                                            options: options
+                                          });
+
+
+
+  };
+
+
+function submitDates(evt) {
+  evt.preventDefault();
+
+  var formInputs = {
+      "comp-start": $("#comp-start").val(),
+      "comp-end": $("#comp-end").val()
+  };
+
+  $.get("/user/compliance.json",
+        formInputs,
+        showChart
+        );
+}
+
+$('#comp-btn').on('click', submitDates);
+</script>
+
+{% endblock %}

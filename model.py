@@ -95,7 +95,7 @@ class Compliance(db.Model):
     freq_id = db.Column(db.Integer,
                         db.ForeignKey('frequencies.freq_id'))
     sched_time = db.Column(db.DateTime, nullable=False)
-    actual_time = db.Column(db.Boolean, nullable=True)
+    actual_time = db.Column(db.Boolean, nullable=False, default=False)
     reminder = db.Column(db.Boolean, nullable=False)
 
     def __repr__(self):

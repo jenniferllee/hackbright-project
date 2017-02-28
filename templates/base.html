@@ -1,15 +1,20 @@
 <!doctype html>
 <html>
 <head>
-  <title>TITLE</title>
+  <title>My Pillbox</title>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" href="/static/my-pillbox.css"> -->
 
   <script src="http://code.jquery.com/jquery.js"></script>
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"></script>
+
 </head>
 <body>
-TITLE
+My Pillbox
 <hr>
 
   {% with messages = get_flashed_messages() %}
@@ -25,6 +30,7 @@ TITLE
 {% block content %} put your content here {% endblock %}
 
 <!-- <script src="/static/js/new-med.js"></script> -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </body>
 </html>

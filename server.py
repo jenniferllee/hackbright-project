@@ -139,28 +139,154 @@ def show_todays_meds():
     frequency_list = []
 
     for frequency in frequencies:
-        med = Medication.query.get(frequency.med_id)
-        frequency.name = med.name
-        frequency.dose = med.dose
-        frequency.unit = med.unit
-        frequency.times = set([compliance.sched_time.strftime('%I:%M %p') for compliance in Compliance.query.filter_by(freq_id=frequency.freq_id).all()])
-        if frequency.days == 'Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday':
-            frequency.days = 'Everyday'
+        is_today = False
+        compliances = Compliance.query.filter(Compliance.freq_id == frequency.freq_id).all()
+        for compliance in compliances:
+            if compliance.sched_time.date() == todays_date:
+                is_today = True
 
-        frequency_list.append(frequency)
+                med = Medication.query.get(frequency.med_id)
+                frequency.name = med.name
+                frequency.dose = med.dose
+                frequency.unit = med.unit
+                compliance_filter = Compliance.query.filter(Compliance.freq_id == frequency.freq_id).all()
+                frequency.times = [(compliance.sched_time.strftime('%I:%M %p'), compliance.comp_id, compliance.actual_time) for compliance in compliance_filter if compliance.sched_time.date() == todays_date]
+        if is_today:
+            frequency_list.append(frequency)
+
+
+
+
+    # user_id = session['Logged in user']
+
+    # today = datetime.datetime.strftime(datetime.datetime.now(), '%A, %B %d %Y')
+    # todays_date = datetime.datetime.now().date()
+
+    # frequencies = Frequency.query.filter_by(user_id=user_id).all()
+
+    # frequency_list = []
+
+    # for frequency in frequencies:
+    #     compliance_filter = Compliance.query.filter(Compliance.freq_id == frequency.freq_id).all()
+    #     med = Medication.query.get(frequency.med_id)
+
+    #     if compliance.sched_time.date() == todays_date:
+    #         frequency.name = med.name
+    #         frequency.dose = med.dose
+    #         frequency.unit = med.unit
+    #         frequency.time
+
+
 
     return render_template("today.html", today=today, frequencies=frequency_list)
 
 
-@app.route("/user/today/taken")
-def mark_as_taken():
+@app.route("/user/today/taken", methods=["POST"])
+def changeCompliance():
     """Adds taken information to compliance table."""
 
-    # comp = Compliance.query.get("comp_id")
-    # comp.taken = True
-    # db.session.commit
+    comp_id = int(request.form.get("comp_id"))
+    taken = request.form.get("taken")
 
-    return "Taken"
+    comp = Compliance.query.get(comp_id)
+    comp.actual_time = taken
+
+    db.session.commit()
+
+    return "taken changed"
+
+
+@app.route("/user/compliance")
+def show_compliance():
+    """Shows graph of user's medication compliance for a given time frame."""
+
+    today = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d')
+
+    return render_template('compliance.html', today=today)
+
+
+@app.route("/user/compliance.json", methods=["GET"])
+def display_compliance_chart():
+    """Gets date range and return chart data about user compliance."""
+
+    comp_start = request.args.get("comp-start")
+    comp_start = datetime.datetime.strptime(comp_start, "%Y-%m-%d").date()
+    print comp_start
+    comp_end = request.args.get("comp-end")
+    comp_end = datetime.datetime.strptime(comp_end, "%Y-%m-%d").date()
+    print comp_end
+
+    user_id = session['Logged in user']
+    frequencies = Frequency.query.filter_by(user_id=user_id).all()
+
+    taken = []
+    not_taken = []
+
+    for frequency in frequencies:
+        comp_true = Compliance.query.filter((Compliance.freq_id == frequency.freq_id) & (Compliance.actual_time)).all()
+        for comp in comp_true:
+            if comp.sched_time.date() >= comp_start and comp.sched_time.date() <= comp_end:
+                taken.append(comp)
+
+    for frequency in frequencies:
+        comp_false = Compliance.query.filter((Compliance.freq_id == frequency.freq_id) & (Compliance.actual_time == False)).all()
+        for comp in comp_false:
+            if comp.sched_time.date() >= comp_start and comp.sched_time.date() <= comp_end:
+                not_taken.append(comp)
+
+    num_taken = len(taken)
+    num_not_taken = len(not_taken)
+    print num_taken
+    print num_not_taken
+
+    data_dict = {
+                "labels": [
+                    "Taken",
+                    "Not taken"
+                ],
+                "datasets": [
+                    {
+                        "data": [num_taken, num_not_taken],
+                        "backgroundColor": [
+                            "#FF6384",
+                            "#36A2EB",
+                        ],
+                        "hoverBackgroundColor": [
+                            "#FF6384",
+                            "#36A2EB",
+                        ]
+                    }]
+        }
+
+    return jsonify(data_dict)
+    # return redirect("/user/compliance")
+    # return "hi"
+
+
+# @app.route("/user/compliance.json")
+# def compliance_chart():
+#   """Return data about user compliance."""
+
+    # data_dict = {
+    #                 "labels": [
+    #                     "Taken",
+    #                     "Not taken"
+    #                 ],
+    #                 "datasets": [
+    #                     {
+    #                         "data": [500, 30],
+    #                         "backgroundColor": [
+    #                             "#FF6384",
+    #                             "#36A2EB",
+    #                         ],
+    #                         "hoverBackgroundColor": [
+    #                             "#FF6384",
+    #                             "#36A2EB",
+    #                         ]
+    #                     }]
+    #         }
+
+    # return jsonify(data_dict)
 
 
 @app.route("/logout")
