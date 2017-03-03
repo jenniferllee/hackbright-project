@@ -1,13 +1,10 @@
 from jinja2 import StrictUndefined
 from flask import (Flask, jsonify, render_template, redirect, request, flash,
-                   session, url_for)
+                   session)
 from flask_debugtoolbar import DebugToolbarExtension
 from model import (User, Medication, Frequency, Compliance, Drug,
                    connect_to_db, db)
 import datetime
-import time
-# from twilio.rest import TwilioRestClient
-# import os
 import json
 
 app = Flask(__name__)
@@ -28,7 +25,7 @@ def homepage():
 
 @app.route("/login")
 def login():
-    """Sign up for an account."""
+    """Sign up for an account or login with an existing account."""
 
     return render_template("login.html")
 
@@ -50,9 +47,9 @@ def handle_login_form():
 
         # If password is correct, login user to user page.
         if password == user.password:
-            session['Logged in user'] = user.user_id
+            session["Logged in user"] = user.user_id
             flash("Welcome, " + user.fname + "! You are logged in.")
-            return redirect('/user')
+            return redirect("/user")
 
         # If password is incorrect, flash "Password invalid."
         else:
@@ -76,7 +73,7 @@ def register():
 def handle_registration_info():
     """Handle registration submission and redirect to login page."""
 
-    # Get name, email and password from registration form submission.
+    # Get name, email, phone, and password from registration form submission.
     fname = request.form.get("fname")
     lname = request.form.get("lname")
     email = request.form.get("email")
@@ -102,19 +99,27 @@ def handle_registration_info():
 
 @app.route("/user")
 def show_user_page():
-    """Displays individual user page with medication list."""
+    """Displays individual user page with all medications for the user.
+    User has the option to add or remove medications.
+    """
 
     user_id = session['Logged in user']
 
+    # Get all the frequencies for the user.
     frequencies = Frequency.query.filter_by(user_id=user_id).all()
 
     frequency_list = []
 
+    # Query name, dose, day, and time for each of the user's medications, and append query object to frequency_list.
     for frequency in frequencies:
+
+        # Query medication information
         med = Medication.query.get(frequency.med_id)
         frequency.name = med.name
         frequency.dose = med.dose
         frequency.unit = med.unit
+
+        # Query scheduled day, time, and whether a reminder is set for the medication.
         frequency.times = set([(compliance.sched_time.strftime('%I:%M %p'),
                                 compliance.reminder) for compliance in Compliance.query.filter_by(freq_id=frequency.freq_id).all()])
         if frequency.days == 'Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday':
@@ -127,15 +132,22 @@ def show_user_page():
 
 @app.route("/user/today")
 def show_todays_meds():
-    """Displays the medications that need to be taken for the day."""
+    """Displays the medications that need to be taken for the day.
+    User has the option to mark each dose as taken.
+    """
 
     user_id = session['Logged in user']
 
+    # Today's date for template display.
     today = datetime.datetime.strftime(datetime.datetime.now(), '%A, %B %d %Y')
+
+    # Today's date as a date object.
     todays_date = datetime.datetime.now().date()
 
+    # Get all the frequencies for the user.
     frequencies = Frequency.query.filter_by(user_id=user_id).all()
 
+    # Query name, dose, and scheduled time for medications user is scheduled to take today.
     frequency_list = []
 
     for frequency in frequencies:
@@ -154,30 +166,6 @@ def show_todays_meds():
         if is_today:
             frequency_list.append(frequency)
 
-
-
-
-    # user_id = session['Logged in user']
-
-    # today = datetime.datetime.strftime(datetime.datetime.now(), '%A, %B %d %Y')
-    # todays_date = datetime.datetime.now().date()
-
-    # frequencies = Frequency.query.filter_by(user_id=user_id).all()
-
-    # frequency_list = []
-
-    # for frequency in frequencies:
-    #     compliance_filter = Compliance.query.filter(Compliance.freq_id == frequency.freq_id).all()
-    #     med = Medication.query.get(frequency.med_id)
-
-    #     if compliance.sched_time.date() == todays_date:
-    #         frequency.name = med.name
-    #         frequency.dose = med.dose
-    #         frequency.unit = med.unit
-    #         frequency.time
-
-
-
     return render_template("today.html", today=today, frequencies=frequency_list)
 
 
@@ -185,9 +173,11 @@ def show_todays_meds():
 def changeCompliance():
     """Adds taken information to compliance table."""
 
+    # Retrieve compliance from AJAX request.
     comp_id = int(request.form.get("comp_id"))
     taken = request.form.get("taken")
 
+    # Update database to reflect compliance.
     comp = Compliance.query.get(comp_id)
     comp.actual_time = taken
 
@@ -200,6 +190,7 @@ def changeCompliance():
 def show_compliance():
     """Shows graph of user's medication compliance for a given time frame."""
 
+    # Today's date for template display.
     today = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d')
 
     return render_template('compliance.html', today=today)
@@ -240,53 +231,25 @@ def display_compliance_chart():
     print num_not_taken
 
     data_dict = {
-                "labels": [
-                    "Taken",
-                    "Not taken"
+        "labels": [
+            "Taken",
+            "Not Taken"
+        ],
+        "datasets": [
+            {
+                "data": [num_taken, num_not_taken],
+                "backgroundColor": [
+                    "#FF6384",
+                    "#36A2EB",
                 ],
-                "datasets": [
-                    {
-                        "data": [num_taken, num_not_taken],
-                        "backgroundColor": [
-                            "#FF6384",
-                            "#36A2EB",
-                        ],
-                        "hoverBackgroundColor": [
-                            "#FF6384",
-                            "#36A2EB",
-                        ]
-                    }]
-        }
+                "hoverBackgroundColor": [
+                    "#FF6384",
+                    "#36A2EB",
+                ]
+            }]
+    }
 
     return jsonify(data_dict)
-    # return redirect("/user/compliance")
-    # return "hi"
-
-
-# @app.route("/user/compliance.json")
-# def compliance_chart():
-#   """Return data about user compliance."""
-
-    # data_dict = {
-    #                 "labels": [
-    #                     "Taken",
-    #                     "Not taken"
-    #                 ],
-    #                 "datasets": [
-    #                     {
-    #                         "data": [500, 30],
-    #                         "backgroundColor": [
-    #                             "#FF6384",
-    #                             "#36A2EB",
-    #                         ],
-    #                         "hoverBackgroundColor": [
-    #                             "#FF6384",
-    #                             "#36A2EB",
-    #                         ]
-    #                     }]
-    #         }
-
-    # return jsonify(data_dict)
 
 
 @app.route("/logout")
@@ -479,7 +442,7 @@ def handle_med_info():
     #         db.session.commit()
 
     flash("New medication added to your list.")
-    return redirect('/user')
+    return "Drug added."
 
 
 @app.route("/remove-med", methods=['POST'])

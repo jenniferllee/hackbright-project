@@ -1,6 +1,15 @@
-{% extends 'base.html' %}
-{% block content %}
-
-Click <a href="/login">here</a> to login.
-
-{% endblock %}
+<html>
+<head>
+  <title>My Pillbox</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/my-pillbox.css">
+</head>
+<body>
+  <div class="welcome">Welcome to</div>
+  <div class="title">My Pillbox
+  <form class="text-middle" action="/login">
+    <input type="submit" id="home-login-btn" class="btn btn-info btn-lg" value="Login">
+  </form>
+  <!-- <div class="subtitle">Click <a href="/login">here</a> to login.</div> -->
+</body>
+</html>

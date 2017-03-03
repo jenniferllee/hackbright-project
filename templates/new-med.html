@@ -1,6 +1,50 @@
 {% extends 'base.html' %}
 {% block content %}
 
+
+<!-- <form>
+  <div class="form-group">
+    <label for="med_name">Medication Name: </label>
+    <input class="form-control" id="med-name" placeholder="Medication">
+  </div>
+
+  <div class="form-group">
+    <label for="med-dose">Dosage: </label>
+    <input type="number" class="form-control" id="med-dose" placeholder="Dose">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputEmail2">Email</label>
+    <input type="email" class="form-control" id="exampleInputEmail2" placeholder="jane.doe@example.com">
+  </div>
+
+
+  <div class="form-group">
+    <label for="med-dose">Dosage: </label>
+    <input type="number" class="form-control" id="med-dose" placeholder="Dose">
+      <select id="unit" class="form-control" name="unit">
+        <option value="none">----</option>
+        <option value="mg">mg</option>
+        <option value="mL">mL</option>
+        <option value="capsule(s)">capsule(s)</option>
+        <option value="unit">unit(s)</option>
+        <option value="other">other</option>
+      </select><br>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputFile">File input</label>
+    <input type="file" id="exampleInputFile">
+    <p class="help-block">Example block-level help text here.</p>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"> Check me out
+    </label>
+  </div>
+  <button type="submit" class="btn btn-default">Submit</button>
+</form> -->
+
+
+
   <form action="/new-med-success" method="post">
 
     <div class="ui-widget">
@@ -9,18 +53,18 @@
     </div>
 
     <script>
-    var dropDownItems;
+      var dropDownItems;
 
-    $.get('/drug-names.json', function (results) {
-      dropDownItems = JSON.parse(results)
+      $.get('/drug-names.json', function (results) {
+        dropDownItems = JSON.parse(results)
 
-      $(function() {
-      var drugNames = dropDownItems;
-      $('#med-name').autocomplete({
-      source: drugNames
-    });
-    });
-    });
+        $(function() {
+        var drugNames = dropDownItems;
+        $('#med-name').autocomplete({
+        source: drugNames
+      });
+      });
+      });
     </script>
     
     <label>Dosage: </label>

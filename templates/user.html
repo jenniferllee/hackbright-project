@@ -1,30 +1,352 @@
 {% extends 'base.html' %}
 {% block content %}
-<!-- {% macro input(value='hello') -%}
-  <input value="{{value}}"/>
-{%- endmacro %} -->
 
-  <div>
-    <a href="/logout">Logout</a>
+<div class="text-center"><h1>My Medications</h1></div>
+
+
+<div class="container">
+  <!-- Trigger the modal with a button -->
+  <div class="text-center">
+    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Add a medication</button>
   </div>
 
-  <div>
-    <a href="/user">View All Medications</a>
-  </div>
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Add a medication</h4>
+        </div>
+        <div class="modal-body">
 
-  <div>
-    <a href="/user/today">Today</a>
-  </div>
 
-  <div>
-    <a href="/user/compliance">Compliance</a>
-  </div>
 
+          <form action="/new-med-success" method="post">
+
+            <div class="ui-widget">
+              <label for="med_name">Medication Name: </label>
+              <input id="med-name" name="med-name">
+            </div>
+
+            <script>
+              var dropDownItems;
+
+              $.get('/drug-names.json', function (results) {
+                dropDownItems = JSON.parse(results)
+
+                $(function() {
+                var drugNames = dropDownItems;
+                $('#med-name').autocomplete({
+                source: drugNames
+              });
+              });
+              });
+            </script>
+            
+            <label>Dosage: </label>
+              <input type="number" id="med-dose" name="med-dose">
+              <select id="unit" name="unit">
+                <option value="none">----</option>
+                <option value="mg">mg</option>
+                <option value="mL">mL</option>
+                <option value="capsule(s)">capsule(s)</option>
+                <option value="unit">unit(s)</option>
+                <option value="other">other</option>
+              </select><br>
+
+            <label>Start date: </label>
+              <input type="date" id="start-date" name="start-date"><br>
+
+            <label>End date: </label>
+              <input type="date" id="end-date" name="end-date"><br>
+
+            <label>Frequency: </label>
+            <select id="frequency" name="frequency">
+              <option value="none">----</option>
+              <option value="everyday">Everyday</option>
+              <!-- <option value="day-interval">Day Interval</option> -->
+              <option value="specific-days">Specific Days</option>
+              <option value="as-needed">As Needed</option>
+            </select><br>
+
+
+            <!-- Display for Everyday only -->
+            <div id="everyday" style="display:none">
+              <label>How many times a day? </label>
+                <input type="number" id="etimes_per_day" name="etimes_per_day" value=1><br>
+
+              <label>What time?</label>
+                <div id="everyday-time-input">
+                  <input type="time" name="everyday-time-0">
+                  Set reminder?
+                  <input type="radio" class="everyday-remind-input" name="everyday-remind-0" value="no" checked>No
+                  <input type="radio" class="everyday-remind-input" name="everyday-remind-0" value="yes">Yes
+                </div>
+                  <br>
+            </div>
+
+
+            <!-- JAVASCRIPT START -->
+            <script type="text/javascript">
+              function showEveryday() {
+                if ($('#frequency').val() == 'everyday') {
+                  $('#everyday').show();
+                }
+                else {
+                  $('#everyday').hide();
+                }};
+
+              $('#frequency').on('change', showEveryday);
+
+              function chooseEverydayTime() {
+                var times_per_day = Number($('#etimes_per_day').val());
+                var input_time_field = '<input type="time">';
+                var input_remind_field_no = 'Set reminder? <input type="radio" value="no" checked>No';
+                var input_remind_field_yes = '<input type="radio" value="yes">Yes';
+
+                $('#everyday-time-input').empty();
+                $('#everyday-remind-input').empty();
+
+                for (var i=0; i<times_per_day; i++) {
+
+                  $('#everyday-time-input').append(input_time_field);
+                  $('#everyday-time-input').children().last().attr("name", ("everyday-time-" + i));
+
+                  $('#everyday-time-input').append(input_remind_field_no);
+                  $('#everyday-time-input').children().last().attr("name", ("everyday-remind-" + i));
+
+                  $('#everyday-time-input').append(input_remind_field_yes);
+                  $('#everyday-time-input').children().last().attr("name", ("everyday-remind-" + i));
+
+                  $('#everyday-time-input').append('<br>');
+                }}
+
+              $('#etimes_per_day').bind('input', chooseEverydayTime);
+            </script>
+            <!-- JAVASCRIPT END -->
+
+            
+            <!-- Display for Day Interval only -->
+            <!-- <div id="day-interval" style="display:none">
+            <label>Every </label>
+              <input type="number" id="interval" name="interval">Days<br>
+
+            <label>How many times a day? </label>
+              <input type="number" id="itimes_per_day" name="itimes_per_day" value=1><br>
+
+            <label>What time? </label>
+              <div id="interval-time-input">
+                <input type="time" name="interval-time-0">
+                Set reminder?
+                <input type="radio" class="interval-remind-input" name="interval-remind-0" value="no" checked>No
+                <input type="radio" class="interval-remind-input" name="interval-remind-0" value="yes">Yes
+              </div>
+            </div> -->
+
+
+            <!-- JAVASCRIPT START
+            <script type="text/javascript">
+            //   function showDayInterval() {
+            //     if ($('#frequency').val() == 'day-interval') {
+            //       $('#day-interval').show();
+            //     }
+            //     else {
+            //       $('#day-interval').hide();
+            //     }};
+
+            //   $('#frequency').on('change', showDayInterval);
+
+            //   function chooseIntervalTime() {
+            //     var times_per_day = Number($('#itimes_per_day').val());
+            //     var input_field = '<input type="time">'
+            //     var input_remind_field_no = 'Set reminder? <input type="radio" value="no" checked>No';
+            //     var input_remind_field_yes = '<input type="radio" value="yes">Yes';
+
+            //     $('#interval-time-input').empty();
+
+            //     for (i=0; i<times_per_day; i++) {
+            //       $('#interval-time-input').append(input_field);
+            //       $('#interval-time-input').children().last().attr("name", ("interval-time-" + i));
+
+            //       $('#interval-time-input').append(input_remind_field_no);
+            //       $('#interval-time-input').children().last().attr("name", ("interval-remind-" + i));
+
+            //       $('#interval-time-input').append(input_remind_field_yes);
+            //       $('#interval-time-input').children().last().attr("name", ("interval-remind-" + i));
+
+            //       $('#interval-time-input').append('<br>');
+            //     }}
+
+            //   $('#itimes_per_day').bind('input', chooseIntervalTime);
+            // </script>
+            JAVASCRIPT END -->
+
+
+            <!-- Display for Specific Days only -->
+            <div id="specific-days" style="display:none">
+            <label>Select the days: </label><br>
+            <input type="checkbox" name="day" value="Monday">Monday</option><br>
+            <input type="checkbox" name="day" value="Tuesday">Tuesday</option><br>
+            <input type="checkbox" name="day" value="Wednesday">Wednesday</option><br>
+            <input type="checkbox" name="day" value="Thursday">Thursday</option><br>
+            <input type="checkbox" name="day" value="Friday">Friday</option><br>
+            <input type="checkbox" name="day" value="Saturday">Saturday</option><br>
+            <input type="checkbox" name="day" value="Sunday">Sunday</option><br>
+
+            <label>How many times a day? </label>
+                <input type="number" id="stimes_per_day" name="stimes_per_day" value=1><br>
+
+            <label>What time? </label>
+              <div id="specific-time-input">
+                <input type="time" name="specific-time-0">
+                Set reminder?
+                <input type="radio" class="specific-remind-input" name="specific-remind-0" value="no" checked>No
+                <input type="radio" class="specific-remind-input" name="specific-remind-0" value="yes">Yes
+              </div>
+            </div>
+
+
+            <!-- JAVASCRIPT START-->
+            <script type="text/javascript">
+              function showSpecificDays() {
+                if ($('#frequency').val() == 'specific-days') {
+                  $('#specific-days').show();
+                }
+                else {
+                  $('#specific-days').hide();
+                }};
+
+              $('#frequency').on('change', showSpecificDays);
+
+
+              function chooseSpecificTime() {
+                var times_per_day = Number($('#stimes_per_day').val());
+                var input_field = '<input type="time">'
+                var input_remind_field_no = 'Set reminder? <input type="radio" value="no" checked>No';
+                var input_remind_field_yes = '<input type="radio" value="yes">Yes';
+
+                $('#specific-time-input').empty();
+
+                for (i=0; i<times_per_day; i++) {
+                  $('#specific-time-input').append(input_field);
+                  $('#specific-time-input').children().last().attr("name", ("specific-time-" + i));
+
+                  $('#specific-time-input').append(input_remind_field_no);
+                  $('#specific-time-input').children().last().attr("name", ("specific-remind-" + i));
+
+                  $('#specific-time-input').append(input_remind_field_yes);
+                  $('#specific-time-input').children().last().attr("name", ("specific-remind-" + i));
+
+                  $('#specific-time-input').append('<br>');
+                }}
+
+              $('#stimes_per_day').bind('input', chooseSpecificTime);
+            </script>
+            <!-- JAVASCRIPT END -->
+
+            <input type="submit" id="form-submission-button" value="Add">
+          </form>
+
+
+
+        </div>
+
+      </div>
+      
+    </div>
+  </div>
   <br>
-  <br>
 
-  <form action="/new-med">
-    <input type="submit" id="add-med-button" value="Add a medication">
+
+
+
+<!-- JAVASCRIPT -->
+<script type="text/javascript">
+
+  //   function confirmDrugAdd(result) {
+  //     console.log(result);
+  //     }
+
+  //   function addNewMed(evt) {
+  //     evt.preventDefault();
+  //     alert("hi");
+
+  //     var formInputs = {
+  //       "med-name": $("#med-name").val(),
+  //       "med-dose": $("#med-dose").val(),
+  //       "unit": $("#unit").val(),
+  //       "start-date": $("#start-date").val(),
+  //       "end-date": $("#end-date").val(),
+  //       "frequency": $("#frequency").val(),
+  //       "etimes_per_day": $("#etimes_per_day").val(),
+  //       "stimes_per_day": $("#etimes_per_day").val(),
+  //       med_name": this.id,
+  //       med_name": this.id
+  //       };
+
+  //   $.post("/new-med-success",
+  //          formInputs,
+  //          confirmDrugAdd
+  //          );
+
+  //   // this.parentElement.parentElement.parentElement.parentElement.remove()
+  //   }
+
+  // $("#form-submission-button").on("submit", addNewMed)
+</script>
+
+
+
+
+
+
+<!-- <form class="text-right" action="/new-med">
+    <input type="submit" id="add-med-button" class="btn btn-primary btn-lg" value="Add a medication">
+</form> -->
+
+<div>
+  <!-- <div class="text-center"><h1>My Medications</h1></div> -->
+
+  {% for frequency in frequencies %}
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">{{frequency.name}} ({{frequency.dose}} {{frequency.unit}})
+      </div>
+    </div>
+    <div class="panel-body">
+      <ul>
+        <li data-start="{{frequency.start_date.date()}}">Start date: {{frequency.start_date.date()}}</li>
+        <li data-end="{{frequency.end_date.date()}}">End date: {{frequency.end_date.date()}}</li>
+        <li id="days-{{frequency.freq_id}}">Days: {{frequency.days}}</li>
+        {% for time in frequency.times %}
+        <li>Scheduled time: {{time[0]}}
+            {% if time[1] == True %}
+            <span class="label label-info">Reminder Set</span>
+            {% endif %}
+        {% endfor %}
+        <br><br>
+        <button id="{{frequency.med_id}}" class="remove-btn" type="button">Remove</button>
+      </ul>
+    </div>
+  </div>
+
+  {% endfor %}
+
+</div>
+
+
+
+
+
+
+
+
+<!--   <form action="/new-med">
+    <input type="submit" id="add-med-button" class="btn btn-primary btn-lg" value="Add a medication">
   </form>
 
   <div>
@@ -42,31 +364,30 @@
           {% for time in frequency.times %}
           <li>Scheduled time: {{time[0]}}
               {% if time[1] == True %}
-              Reminder Set
+              <span class="label label-info">Reminder Set</span>
               {% endif %}
           {% endfor %}
           <li><button id="{{frequency.med_id}}" class="remove-btn" type="button">Remove</button></li>
-          <!-- <li>{{input()}}</li> -->
         </ul>
       </ul>
     </div>
 
     {% endfor %}
-  </div>
+  </div> -->
 
     <!-- INSERT JAVASCRIPT HERE -->
   <script type="text/javascript">
     function confirmDrugRemoval(result) {
-      alert(result);
+      console.log(result);
       }
 
-    function removeDrug() {
+    function removeDrug(evt) {
       confirm("Are you sure you want to remove this drug?");
 
       var formInputs = {
         "med_id": this.id,
-        "start_date": $(this).parent().siblings(":nth-of-type(2)").data("start"),
-        "end_date": $(this).parent().siblings(":nth-of-type(3)").data("end")
+        "start_date": $(this).parent().parent().children().eq(0).data("start"),
+        "end_date": $(this).parent().parent().children().eq(1).data("end")
         };
 
     $.post("/remove-med",
@@ -74,7 +395,7 @@
            confirmDrugRemoval
            );
 
-    this.closest("div").remove()
+    this.parentElement.parentElement.parentElement.parentElement.remove()
     }
 
     $('.remove-btn').on('click', removeDrug);

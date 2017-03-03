@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div>
+<!-- <div>
   <a href="/logout">Logout</a>
 </div>
 
@@ -18,47 +18,145 @@
 </div>
 
 <br>
-<br>
+<br> -->
 
+<div class="text-center">
+  <form class="form-inline">
+    <div class="form-group">
+      <label for="comp-start">Dates beteen: </label>
+      <input type="date" class="form-control" id="comp-start" name="comp-start" value={{today}}>
+    </div>
+    <div class="form-group">
+      <label for="comp-end">and</label>
+      <input type="date" class="form-control" id="comp-end" name="comp-end" value={{today}}>
+    </div>
+    <input type="submit" class="btn btn-default" id="comp-btn" value="Go">
+  </form>
+</div>
+
+
+<!-- 
 <form>
   Dates between:
-  <input type="date" id="comp-start" name="comp-start"> and
+  <input type="date" id="comp-start" name="comp-start" value={{today}}> and
   <input type="date" id="comp-end" name="comp-end" value={{today}}>
   <input type="submit" id="comp-btn" value="Go">
-</form>
+</form> -->
 
 <br>
 <br>
 
 <div class="comp-chart">
-  <canvas id="donutChart"></canvas>
+  <canvas id="myChart"></canvas>
   <div id="donutLegend" class="chart-legend"></div>
 <div>
 
+
+<!-- JAVASCRIPT STARTS -->
+
+
 <script type="text/javascript">
 function showChart(data) {
-  Chart.types.doughnut.extend({
-    name: "DoughnutAlt",
-    draw: function() {
-        Chart.types.Doughnut.prototype.draw.apply(this, arguments);
-        this.chart.ctx.fillStyle = 'black';
-        this.chart.ctx.textBaseline = 'middle';
-        this.chart.ctx.fillText(this.segments[0].value + "%", this.chart.width / 2 - 20, this.chart.width / 2, 200);
-    }
-  });
 
+  Chart.pluginService.register({
+      afterUpdate: function (chart) {
+        if (chart.config.options.elements.center) {
+          var helpers = Chart.helpers;
+          var centerConfig = chart.config.options.elements.center;
+          var globalConfig = Chart.defaults.global;
+          var ctx = chart.chart.ctx;
 
-  var options = { responsive: true };
+          var fontStyle = helpers.getValueOrDefault(centerConfig.fontStyle, globalConfig.defaultFontStyle);
+          var fontFamily = helpers.getValueOrDefault(centerConfig.fontFamily, globalConfig.defaultFontFamily);
 
-  var ctx_donut = $("#donutChart").get(0).getContext("2d");
+          if (centerConfig.fontSize)
+            var fontSize = centerConfig.fontSize;
+          // figure out the best font size, if one is not specified
+          else {
+            ctx.save();
+            var fontSize = helpers.getValueOrDefault(centerConfig.minFontSize, 1);
+            var maxFontSize = helpers.getValueOrDefault(centerConfig.maxFontSize, 256);
+            var maxText = helpers.getValueOrDefault(centerConfig.maxText, centerConfig.text);
 
-  var myDonutChart = new Chart(ctx_donut, {
-                                            type: 'doughnut',
-                                            data: data,
-                                            options: options
-                                          });
+            do {
+              ctx.font = helpers.fontString(fontSize, fontStyle, fontFamily);
+              var textWidth = ctx.measureText(maxText).width;
 
+              // check if it fits, is within configured limits and that we are not simply toggling back and forth
+              if (textWidth < chart.innerRadius * 2 && fontSize < maxFontSize)
+                fontSize += 1;
+              else {
+                // reverse last step
+                fontSize -= 1;
+                break;
+              }
+            } while (true)
+            ctx.restore();
+          }
 
+          // save properties
+          chart.center = {
+            font: helpers.fontString(fontSize, fontStyle, fontFamily),
+            fillStyle: helpers.getValueOrDefault(centerConfig.fontColor, globalConfig.defaultFontColor)
+          };
+        }
+      },
+
+      afterDraw: function (chart) {
+        if (chart.center) {
+          var centerConfig = chart.config.options.elements.center;
+          var ctx = chart.chart.ctx;
+
+          ctx.save();
+          ctx.font = chart.center.font;
+          ctx.fillStyle = chart.center.fillStyle;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          var centerX = (chart.chartArea.left + chart.chartArea.right) / 2;
+          var centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
+          ctx.fillText(centerConfig.text, centerX, centerY);
+          ctx.restore();
+        }
+      },
+    })
+
+  var tokens = data.datasets[0].data;
+  var percentage = String(parseInt((tokens[0]/(tokens[0]+tokens[1]))*100)) + "%"
+
+  var config = {
+    type: 'doughnut',
+    data: data,
+      options: {
+          elements: {
+            center: {
+              // the longest text that could appear in the center
+              maxText: '100%',
+              text: percentage,
+              fontColor: '#FF6384',
+              fontFamily: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
+              fontStyle: 'normal',
+              // fontSize: 12,
+              // if a fontSize is NOT specified, we will scale (within the below limits) maxText to take up the maximum space in the center
+              // if these are not specified either, we default to 1 and 256
+              minFontSize: 1,
+              maxFontSize: 256,
+            }
+          }
+        }
+      };
+
+    var ctx = document.getElementById("myChart").getContext("2d");
+    var myChart = new Chart(ctx, config);
+
+  // var options = { responsive: true };
+
+  // var ctx = $("#donutChart").get(0).getContext("2d");
+
+  // var myDonutChart = new Chart(ctx, {
+  //                               type: 'doughnut',
+  //                               data: data,
+  //                               options: options
+  //                             });
 
   };
 

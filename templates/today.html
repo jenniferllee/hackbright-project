@@ -1,33 +1,32 @@
 {% extends 'base.html' %}
 {% block content %}
-<!-- {% macro input(value='hello') -%}
-  <input value="{{value}}"/>
-{%- endmacro %} -->
 
-  <div>
-    <a href="/logout">Logout</a>
+
+<div class="text-center"><h1><span>Today is: </span><span><b>{{today}}</b></span></h1></div>
+
+  {% for frequency in frequencies %}
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">{{frequency.name}} {{frequency.dose}} {{frequency.unit}}
+      </div>
+    </div>
+    <div class="panel-body">
+      <ul>
+        {% for time in frequency.times %}
+          <li data-time="time-{{time[0]}}">Scheduled time: {{time[0]}}
+            <button id='{{time[1]}}' class="taken-btn" type="button">Taken</button>
+            <img src="/static/checkmark.png" id="checkmark-{{time[1]}}" style={% if time[2] == True %}"display: inline"{% else %}"display: none"{% endif %} width='10' height='10'>
+          </li>
+          {% endfor %}
+      </ul>
+    </div>
   </div>
 
-  <div>
-    <a href="/user">View All Medications</a>
-  </div>
+  {% endfor %}
 
-  <div>
-    <a href="/user/today">Today</a>
-  </div>
 
-   <div>
-    <a href="/user/compliance">Compliance</a>
-  </div>
-
-  <br>
-  <br>
-
-  <form action="/new-med" >
-    <input type="submit" id="add-med-button" value="Add a medication">
-  </form>
-
-  <div>
+<!--   <div>
     <h1>Today is: {{today}}</h1>
     {% for frequency in frequencies %}
 
@@ -47,32 +46,18 @@
     </div>
 
     {% endfor %}
-  </div>
+  </div> -->
 
     <!-- INSERT JAVASCRIPT HERE -->
   <script type="text/javascript">
 
     function confirmTaken(result) {
-      alert(result);
+      console.log(result);
       }
-
-    // function makeTakenTrue() {
-    //   console.log('made true')
-    //   debugger;
-    //   this.nextElementSibling.style.display = "inline";
-    // }
-
-    // function makeTakenFalse() {
-    //   console.log('made false');
-    //   this.nextElementSibling.style.display = "none";
-    // }
 
     function changeTaken() {
 
       if ($(this).next().is(":hidden")) {
-
-        // $(this).val('True');
-        // console.log($(this).val());
         
         var formInputs = {
           "comp_id": this.id,
@@ -89,16 +74,10 @@
 
       else if ($(this).next().is(":visible")) {
         
-        // $(this).val('False');
-        // console.log($(this).val());
-        
         var formInputs = {
           "comp_id": this.id,
           "taken": false
           };
-
-        // this.nextElementSibling.style.display = "inline"
-        // this.nextElementSibling.style.display = "none"
 
         $.post("/user/today/taken",
              formInputs,
@@ -110,7 +89,6 @@
     }
 
     $('.taken-btn').on('click', changeTaken);
-
 
   </script>
     <!-- END JAVASCRIPT -->
