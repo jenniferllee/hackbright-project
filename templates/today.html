@@ -2,7 +2,10 @@
 {% block content %}
 
 
+<div class="container">
 <div class="text-center"><h1><span>Today is: </span><span><b>{{today}}</b></span></h1></div>
+<br>
+<br>
 
   {% for frequency in frequencies %}
 
@@ -16,14 +19,15 @@
         {% for time in frequency.times %}
           <li data-time="time-{{time[0]}}">Scheduled time: {{time[0]}}
             <button id='{{time[1]}}' class="taken-btn" type="button">Taken</button>
-            <img src="/static/checkmark.png" id="checkmark-{{time[1]}}" style={% if time[2] == True %}"display: inline"{% else %}"display: none"{% endif %} width='10' height='10'>
+            <img src="/static/blue-check-mark.svg" id="checkmark-{{time[1]}}" style={% if time[2] == True %}"display: inline"{% else %}"display: none"{% endif %} width='20' height='20'>
           </li>
-          {% endfor %}
+        {% endfor %}
       </ul>
     </div>
   </div>
 
   {% endfor %}
+</div>
 
 
 <!--   <div>

@@ -233,18 +233,18 @@ def display_compliance_chart():
     data_dict = {
         "labels": [
             "Taken",
-            "Not Taken"
+            "Missed"
         ],
         "datasets": [
             {
                 "data": [num_taken, num_not_taken],
                 "backgroundColor": [
-                    "#FF6384",
-                    "#36A2EB",
+                    "#ADD8E6",
+                    "#A0A0A0 ",
                 ],
                 "hoverBackgroundColor": [
-                    "#FF6384",
-                    "#36A2EB",
+                    "#ADD8E6",
+                    "#A0A0A0 ",
                 ]
             }]
     }
@@ -442,7 +442,7 @@ def handle_med_info():
     #         db.session.commit()
 
     flash("New medication added to your list.")
-    return "Drug added."
+    return redirect("/user")
 
 
 @app.route("/remove-med", methods=['POST'])
@@ -484,6 +484,6 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the DebugToolbar
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
 
     app.run(port=5000, host='0.0.0.0')

@@ -1,15 +1,33 @@
 <html>
 <head>
-  <title>My Pillbox</title>
+  <title>MyPillbox</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <link rel="stylesheet" href="/static/my-pillbox.css">
+  <link href="https://fonts.googleapis.com/css?family=Arimo|Montserrat" rel="stylesheet">
+
 </head>
 <body>
-  <div class="welcome">Welcome to</div>
-  <div class="title">My Pillbox
-  <form class="text-middle" action="/login">
-    <input type="submit" id="home-login-btn" class="btn btn-info btn-lg" value="Login">
-  </form>
-  <!-- <div class="subtitle">Click <a href="/login">here</a> to login.</div> -->
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <p class=flashes>
+      {% for message in messages %}
+        {{ message }}
+      {% endfor %}
+      </p>
+    {% endif %}
+  {% endwith %}
+
+
+  <div class="home-container">
+      <div class="welcome">Welcome to</div>
+      <div class="title">MyPillbox</div>
+      <form action="/login">
+        <input type="submit" id="home-login-btn" class="btn btn-info btn-lg" value="Login">
+      </form>
+      <!-- <div class="subtitle">Click <a href="/login">here</a> to login.</div> -->
+  </div>
+
+
+
 </body>
 </html>

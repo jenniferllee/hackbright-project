@@ -38,5 +38,5 @@ if __name__ == '__main__':
     from server import app
     connect_to_db(app)
 
-    send_sms('Jennifer', 6508238552)
+    send_sms('Jennifer', '6508238552')
     main()

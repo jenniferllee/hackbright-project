@@ -1,0 +1,94 @@
+body {
+    background:url('hand-pills-dark.jpg')no-repeat;
+    background-size:cover;
+    background-attachment: fixed;
+    height: 100%;
+    display:block;
+    padding:0;
+    margin:0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+
+.home-container {
+    height: 10em;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%) }
+
+.welcome {
+    text-align: center;
+    font-size: 250%;
+    font-family: 'Montserrat', sans-serif;
+    color: white; }
+
+.title {
+    text-align: center;
+    font-size: 400%;
+    font-family: 'Arimo', sans-serif;
+    font-weight: bold;
+    color: white;  }
+
+#home-login-btn {
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+    width: 100px;}
+
+.navbar-header {
+    font-family: 'Arimo', sans-serif;
+}
+
+
+.container-login {
+    width: 600px;
+    color: white;
+    position: absolute;
+    top: 30%;
+    right: 20%;
+}
+
+.container {
+    width: 600px;
+}
+
+.ui-widget.ui-widget-content {
+    z-index: 2000;
+}
+
+.ui-widget {
+    font-family: 'Montserrat', sans-serif;
+}
+
+#start-text {
+    font-size: 200%;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    color: white;
+}
+
+#end-text {
+    font-size: 200%;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    color: white; 
+}
+
+.panel-title {
+    font-family: 'Arimo', sans-serif;
+    font-weight: bold;
+}
+
+h1 {
+    color: white;
+    font-family: 'Arimo', sans-serif;
+    font-weight: bold;
+}
+
+.flashes {
+    color: white;
+    margin: 10px;
+}

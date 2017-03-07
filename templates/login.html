@@ -1,8 +1,9 @@
 <html>
 <head>
-  <title>My Pillbox</title>
+  <title>MyPillbox</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-</head>
+  <link rel="stylesheet" href="/static/my-pillbox.css">
+  <link href="https://fonts.googleapis.com/css?family=Arimo|Montserrat" rel="stylesheet"></head>
 <body>
 
   {% with messages = get_flashed_messages() %}
@@ -33,7 +34,7 @@
   <button type="submit" class="btn btn-default" id='submit-button'>Sign in</button>
 </form> -->
 
-
+<div class="container-login">
 <form class="form-horizontal" action="/login-success" method="post" name="login-form">
   <div class="form-group">
     <label for="email" class="col-sm-2 control-label">Email: </label>
@@ -66,6 +67,7 @@
     </div>
   </div>
 </form>
+</div>
 
 
 
